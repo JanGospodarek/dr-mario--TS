@@ -1,0 +1,23 @@
+.cell{
+    width: 18px;
+    height: 18px;
+    border: 1px solid black;
+    position: absolute;
+}
+#board{
+    position: absolute;
+    margin: 20px;
+    width: 160px;
+    height: 300px;
+}
+.pionek{
+    width: 40px;
+    height: 20px;
+    position: absolute;
+
+display: flex;
+}
+.pionek-cell{
+    width: 20px;
+    height: 20px;
+}
