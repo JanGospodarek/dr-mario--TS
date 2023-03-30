@@ -6,11 +6,15 @@ var Game = /** @class */ (function () {
         this.renew = function () {
             _this.renderPionek();
         };
-        this.checkBorderPionks = function (pos) {
-            console.log(pos);
-            var xLeft = pos.x - 20;
-            var xRight = pos.x + 20;
-            var y = pos.y + 20;
+        this.checkBorderPionks = function (pos, rotation) {
+            var xLeft, xRight, y;
+            if (rotation == 90 || rotation == 270) {
+            }
+            else {
+                xLeft = pos.x - 20;
+                xRight = pos.x + 20;
+                y = pos.y + 20;
+            }
             // const index=this.pionks.findIndex(el=>(el.position.x==xLeft||el.position.x==xRight)&&el.position.y==y)
             var index = null;
             _this.pionks.forEach(function (el, i) {
@@ -21,7 +25,6 @@ var Game = /** @class */ (function () {
                     index = i;
                 }
             });
-            console.log(_this.pionks[index]);
             if (index != null)
                 return true;
             else
@@ -60,6 +63,7 @@ var Pionek = /** @class */ (function () {
         this.manualMovingDown = false;
         ///
         this.position = { x: 60, y: 0 };
+        this.rotation = 0;
         this.boardDiv = boardDiv;
         this.buildPionek();
         this.moving();
@@ -105,7 +109,7 @@ var Pionek = /** @class */ (function () {
         }, 400);
     };
     Pionek.prototype.chechForBorderCollisions = function (x, y, autonomous) {
-        if (this.checkBorderPionks(this.position)) {
+        if (this.checkBorderPionks(this.position, this.rotation)) {
             console.log("PIONEK!!!!");
             this.stop = true;
             return true;
@@ -125,6 +129,25 @@ var Pionek = /** @class */ (function () {
                 return true;
             }
         }
+    };
+    Pionek.prototype.rotate = function () {
+        var prevRot = this.rotation;
+        if (prevRot == 360)
+            this.rotation = 0;
+        this.rotation += 90;
+        if (this.rotation == 270 || this.rotation == 90) {
+            this.position.x += 10;
+            this.position.y -= 10;
+            this.pionek.style.left = "".concat(this.position.x, "px");
+            this.pionek.style.top = "".concat(this.position.y, "px");
+        }
+        if (this.rotation == 180 || this.rotation == 360) {
+            this.position.x -= 10;
+            this.position.y += 10;
+            this.pionek.style.top = "".concat(this.position.y, "px");
+            this.pionek.style.left = "".concat(this.position.x, "px");
+        }
+        this.pionek.style.transform = "rotate(".concat(this.rotation, "deg)");
     };
     Pionek.prototype.addControls = function () {
         var _this = this;
@@ -157,6 +180,8 @@ var Pionek = /** @class */ (function () {
                         _this.position.y = span;
                     }
                     break;
+                case "r":
+                    _this.rotate();
             }
         });
         document.addEventListener("keyup", function (e) {

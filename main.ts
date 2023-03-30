@@ -19,11 +19,18 @@ class Game {
   public renew = () => {
     this.renderPionek();
   };
-  public checkBorderPionks = (pos: { x: number; y: number }): boolean => {
-    console.log(pos);
-    const xLeft = pos.x - 20;
-    const xRight = pos.x + 20;
-    const y = pos.y + 20;
+  public checkBorderPionks = (
+    pos: { x: number; y: number },
+    rotation: number
+  ): boolean => {
+    let xLeft, xRight, y;
+    if (rotation == 90 || rotation == 270) {
+    } else {
+      xLeft = pos.x - 20;
+      xRight = pos.x + 20;
+      y = pos.y + 20;
+    }
+
     // const index=this.pionks.findIndex(el=>(el.position.x==xLeft||el.position.x==xRight)&&el.position.y==y)
     let index: number | null = null;
     this.pionks.forEach((el, i) => {
@@ -36,7 +43,6 @@ class Game {
         index = i;
       }
     });
-    console.log(this.pionks[index]);
 
     if (index != null) return true;
     else return false;
@@ -68,6 +74,8 @@ class Pionek {
   private manualMovingDown = false;
   ///
   public position = { x: 60, y: 0 };
+  public rotation = 0;
+
   constructor(
     boardDiv: HTMLDivElement,
     renew: Function,
@@ -125,7 +133,7 @@ class Pionek {
   }
 
   private chechForBorderCollisions(x: any, y: number, autonomous: boolean) {
-    if (this.checkBorderPionks(this.position)) {
+    if (this.checkBorderPionks(this.position, this.rotation)) {
       console.log("PIONEK!!!!");
       this.stop = true;
       return true;
@@ -145,10 +153,30 @@ class Pionek {
       }
     }
   }
+  private rotate() {
+    const prevRot = this.rotation;
+    if (prevRot == 360) this.rotation = 0;
+    this.rotation += 90;
+    if (this.rotation == 270 || this.rotation == 90) {
+      this.position.x += 10;
+      this.position.y -= 10;
+      this.pionek.style.left = `${this.position.x}px`;
+      this.pionek.style.top = `${this.position.y}px`;
+    }
+    if (this.rotation == 180 || this.rotation == 360) {
+      this.position.x -= 10;
+      this.position.y += 10;
+      this.pionek.style.top = `${this.position.y}px`;
+      this.pionek.style.left = `${this.position.x}px`;
+    }
+
+    this.pionek.style.transform = `rotate(${this.rotation}deg)`;
+  }
   private addControls() {
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       if (this.stop) return;
       const key = e.key;
+
       const x = +this.pionek.style.left.split("p")[0];
       const y = +this.pionek.style.top.split("p")[0];
 
@@ -178,6 +206,8 @@ class Pionek {
           }
 
           break;
+        case "r":
+          this.rotate();
       }
     });
     document.addEventListener("keyup", (e: KeyboardEvent) => {
