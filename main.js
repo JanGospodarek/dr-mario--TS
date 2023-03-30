@@ -13,14 +13,19 @@ var Game = /** @class */ (function () {
             var y = pos.y + 20;
             // const index=this.pionks.findIndex(el=>(el.position.x==xLeft||el.position.x==xRight)&&el.position.y==y)
             var index = null;
-            _this.pionks.forEach(function (el) {
-                if (el.position.x == xLeft || el.position.x == xLeft && el.position.y == y) {
+            _this.pionks.forEach(function (el, i) {
+                if ((el.position.x == xRight ||
+                    el.position.x == xLeft ||
+                    el.position.x == pos.x) &&
+                    el.position.y == y) {
+                    index = i;
                 }
             });
+            console.log(_this.pionks[index]);
             if (index != null)
-                return false;
-            else
                 return true;
+            else
+                return false;
         };
         this.renderBoard();
         this.renderPionek();
@@ -30,8 +35,8 @@ var Game = /** @class */ (function () {
             for (var x = 0; x < 8; x++) {
                 var div = document.createElement("div");
                 div.classList.add("cell");
-                div.style.left = 20 * x + "px";
-                div.style.top = 20 * y + "px";
+                div.style.left = "".concat(20 * x, "px");
+                div.style.top = "".concat(20 * y, "px");
                 this.boardCon.append(div);
             }
         }
@@ -44,7 +49,13 @@ var Game = /** @class */ (function () {
 }());
 var Pionek = /** @class */ (function () {
     function Pionek(boardDiv, renew, checkBorderPionks) {
-        this.possibleColors = ["#BB8FCE", "#85C1E9", "#F7DC6F", "#F1948A", "#E59866"];
+        this.possibleColors = [
+            "#BB8FCE",
+            "#85C1E9",
+            "#F7DC6F",
+            "#F1948A",
+            "#E59866",
+        ];
         this.stop = false;
         this.manualMovingDown = false;
         ///
@@ -90,12 +101,14 @@ var Pionek = /** @class */ (function () {
                 return;
             }
             _this.position.y = y;
-            _this.pionek.style.top = y + "px";
+            _this.pionek.style.top = "".concat(y, "px");
         }, 400);
     };
     Pionek.prototype.chechForBorderCollisions = function (x, y, autonomous) {
         if (this.checkBorderPionks(this.position)) {
-            console.log('PIONEK!!!!');
+            console.log("PIONEK!!!!");
+            this.stop = true;
+            return true;
         }
         if (autonomous) {
             if (y >= 300) {
@@ -125,14 +138,14 @@ var Pionek = /** @class */ (function () {
                 case "ArrowLeft":
                     if (!_this.chechForBorderCollisions(x, y, false)) {
                         var span = x - 20;
-                        _this.pionek.style.left = span + "px";
+                        _this.pionek.style.left = "".concat(span, "px");
                         _this.position.x = span;
                     }
                     break;
                 case "ArrowRight":
                     if (!_this.chechForBorderCollisions(x + 40, y, false)) {
                         var span = x + 20;
-                        _this.pionek.style.left = span + "px";
+                        _this.pionek.style.left = "".concat(span, "px");
                         _this.position.x = span;
                     }
                     break;
@@ -140,7 +153,7 @@ var Pionek = /** @class */ (function () {
                     if (!_this.chechForBorderCollisions(x, y + 20, false)) {
                         _this.manualMovingDown = true;
                         var span = y + 20;
-                        _this.pionek.style.top = span + "px";
+                        _this.pionek.style.top = "".concat(span, "px");
                         _this.position.y = span;
                     }
                     break;
