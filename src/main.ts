@@ -16,15 +16,25 @@ class Game {
       }
     }
   }
-  public renew = () => {
+  public renew = (pionek) => {
+    console.log(pionek);
+    const cells=pionek.pionek.children
+    console.log(cells[0].style.left);
+    
     this.renderPionek();
+
   };
   public checkBorderPionks = (
     pos: { x: number; y: number },
     rotation: number
   ): boolean => {
-    let xLeft, xRight, y;
+    let xLeft, xRight, y,x;
     if (rotation == 90 || rotation == 270) {
+      xLeft=pos.x-10
+      xRight=pos.x+10
+      y = pos.y + 30;
+      //  this.position.x += 10;
+      // this.position.y -= 10;
     } else {
       xLeft = pos.x - 20;
       xRight = pos.x + 20;
@@ -34,6 +44,11 @@ class Game {
     // const index=this.pionks.findIndex(el=>(el.position.x==xLeft||el.position.x==xRight)&&el.position.y==y)
     let index: number | null = null;
     this.pionks.forEach((el, i) => {
+
+      if((el.rotation==90||el.rotation==270)&&(el.position.x==xRight-10||el.position.x==xLeft+10||el.position.x-10==x)&&el.position.y==y+10)
+      {
+        index=i
+      }
       if (
         (el.position.x == xRight ||
           el.position.x == xLeft ||
@@ -46,7 +61,7 @@ class Game {
 
     if (index != null) return true;
     else return false;
-  };
+  };r
   private renderPionek() {
     const pionek = new Pionek(
       this.boardCon,
@@ -59,7 +74,7 @@ class Game {
 
 class Pionek {
   private boardDiv: HTMLDivElement;
-  private pionek!: HTMLDivElement;
+  public pionek!: HTMLDivElement;
   private movingInterval: any;
   private possibleColors = [
     "#BB8FCE",
@@ -124,7 +139,7 @@ class Pionek {
 
       if (this.chechForBorderCollisions(undefined, y, true)) {
         clearInterval(this.movingInterval);
-        this.renewGame();
+        this.renewGame(this);
         return;
       }
       this.position.y = y;
@@ -140,19 +155,20 @@ class Pionek {
     }
 
     if (autonomous) {
-      if (y >= 300) {
+      if (y >= 300||((this.rotation==90||this.rotation==270)&&y>=280)) {
         this.stop = true;
         return true;
       }
     } else {
       if (x <= 0 || x >= 160) {
         return true;
-      } else if (y >= 300) {
+      } else if (y >= 300||((this.rotation==90||this.rotation==270)&&y>=280)) {
         this.stop = true;
         return true;
       }
     }
   }
+ 
   private rotate() {
     const prevRot = this.rotation;
     if (prevRot == 360) this.rotation = 0;
