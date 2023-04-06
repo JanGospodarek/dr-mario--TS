@@ -1,9 +1,11 @@
 import { cellObj } from "../types/interfaces";
 import { Pionek } from "./Pionek";
+import genUniqueId from "./utils/genUniqueId";
+
 export class Game {
   private boardCon = <HTMLDivElement>document.getElementById("board");
   public pionks: Pionek[] = [];
-  public stoppedCells: cellObj[] = [];
+  public cells: cellObj[] = [];
   constructor() {
     this.renderBoard();
     this.renderPionek();
@@ -15,9 +17,17 @@ export class Game {
         div.classList.add("cell");
         div.style.left = `${20 * x}px`;
         div.style.top = `${20 * y}px`;
+        this.cells.push({
+          x: 20 * x + 8,
+          y: 20 * y + 8,
+          color: "none",
+          id: genUniqueId(),
+          div: null,
+        });
         this.boardCon.append(div);
       }
     }
+    console.log(this.cells);
   }
   public renew = (pionek: Pionek) => {
     const cells = pionek.pionek.children as HTMLCollectionOf<HTMLElement>;
@@ -27,25 +37,28 @@ export class Game {
       const element = cells[index];
       const pos = element.getBoundingClientRect();
       const color = element.style.backgroundColor;
-      const obj: cellObj = {
-        id: Date.now(),
-        x: pos.x,
-        y: pos.y,
-        color: color,
-      };
-      //   console.log(pos);
-
+      //   const obj: cellObj = {
+      //     id: Date.now(),
+      //     x: pos.x,
+      //     y: pos.y,
+      //     color: color,
+      //   };
+      const i = this.cells.findIndex(
+        (el) => el.x == pos.x - 20 && el.y == pos.y - 20
+      );
+      this.cells[i].color = color;
+      this.cells[i].div = element;
       //   element.style.top = pos.y + "px";
       //   element.style.left = pos.x + "px";
 
       //   this.boardCon.append(element);
-      this.stoppedCells.push(obj);
+      //   this.stoppedCells.push(obj);
     }
     // pionek.pionek.style.display = "none";
-    console.log(this.stoppedCells);
-
+    this.checkForZbicie();
     this.renderPionek();
   };
+  public checkForZbicie() {}
   public checkBorderPionks = (
     pos: { x: number; y: number },
     rotation: number
