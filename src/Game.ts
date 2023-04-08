@@ -27,11 +27,9 @@ export class Game {
         this.boardCon.append(div);
       }
     }
-    console.log(this.cells);
   }
   public renew = (pionek: Pionek) => {
     const cells = pionek.pionek.children as HTMLCollectionOf<HTMLElement>;
-    console.log(cells);
 
     for (let index = 0; index < cells.length; index++) {
       const element = cells[index];
@@ -48,6 +46,8 @@ export class Game {
       );
       this.cells[i].color = color;
       this.cells[i].div = element;
+      this.checkForZbicie(this.cells[i]);
+
       //   element.style.top = pos.y + "px";
       //   element.style.left = pos.x + "px";
 
@@ -55,10 +55,67 @@ export class Game {
       //   this.stoppedCells.push(obj);
     }
     // pionek.pionek.style.display = "none";
-    this.checkForZbicie();
     this.renderPionek();
   };
-  public checkForZbicie() {}
+  public checkForZbicie(obj: cellObj) {
+    const indexLeft = this.cells.findIndex(
+      (el) => el.x == obj.x - 20 && el.y == obj.y
+    );
+    const indexTop = this.cells.findIndex(
+      (el) => el.x == obj.x && el.y == obj.y - 20
+    );
+    const indexRight = this.cells.findIndex(
+      (el) => el.x == obj.x + 20 && el.y == obj.y
+    );
+    const indexBottom = this.cells.findIndex(
+      (el) => el.x == obj.x && el.y == obj.y + 20
+    );
+
+    const indexes = [indexLeft, indexRight, indexTop, indexBottom];
+
+    const checkInRow = (vectorX: number, vectorY: number) => {
+      let bool = true;
+      for (let index = 1; index < 3; index++) {
+        const l = this.cells.findIndex(
+          (el) =>
+            el.x == obj.x + vectorX * index && el.y == obj.y + vectorY * index
+        );
+        // console.log(this.cells[l]);
+
+        if (l == -1) {
+          bool = false;
+          break;
+        }
+        if (this.cells[l].div == null) {
+          bool = false;
+          break;
+        }
+
+        if (this.cells[l].color !== obj.color) {
+          bool = false;
+          break;
+        }
+      }
+      return bool;
+    };
+
+    // console.log(indexes[key]);
+    indexes.forEach((e) => {
+      if (e == -1) return;
+      const element = this.cells[e];
+      // if (element.div == null) return;
+
+      const vectorX = obj.x - element.x;
+      const vectorY = obj.y - element.y;
+
+      // console.log(obj, vectorX, vectorY);
+
+      if (checkInRow(vectorX, vectorY)) {
+        console.log("znaleziono!", obj.color);
+      }
+    });
+  }
+
   public checkBorderPionks = (
     pos: { x: number; y: number },
     rotation: number
@@ -68,15 +125,12 @@ export class Game {
       xLeft = pos.x - 10;
       xRight = pos.x + 10;
       y = pos.y + 30;
-      //  this.position.x += 10;
-      // this.position.y -= 10;
     } else {
       xLeft = pos.x - 20;
       xRight = pos.x + 20;
       y = pos.y + 20;
     }
 
-    // const index=this.pionks.findIndex(el=>(el.position.x==xLeft||el.position.x==xRight)&&el.position.y==y)
     let index: number | null = null;
     this.pionks.forEach((el, i) => {
       if (
