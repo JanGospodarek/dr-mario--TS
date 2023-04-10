@@ -18,6 +18,8 @@
   display: flex;
 }
 .pionek-cell {
+  position: absolute;
+
   width: 20px;
   height: 20px;
 }
