@@ -6,6 +6,7 @@ export class Game {
   private boardCon = <HTMLDivElement>document.getElementById("board");
   public pionks: Pionek[] = [];
   public cells: cellObj[] = [];
+  public cellsToDelete: cellObj[] = [];
   constructor() {
     this.renderBoard();
     this.renderPionek();
@@ -30,6 +31,7 @@ export class Game {
   }
   public renew = (pionek: Pionek) => {
     const cells = pionek.pionek.children as HTMLCollectionOf<HTMLElement>;
+    console.log(cells);
 
     for (let index = 0; index < cells.length; index++) {
       const element = cells[index];
@@ -41,20 +43,22 @@ export class Game {
       //     y: pos.y,
       //     color: color,
       //   };
+      console.log(element);
+
       const i = this.cells.findIndex(
         (el) => el.x == pos.x - 20 && el.y == pos.y - 20
       );
       this.cells[i].color = color;
       this.cells[i].div = element;
       this.checkForZbicie(this.cells[i]);
+      element.classList.add("stopped-cell");
+      element.style.top = pos.y - 8 + "px";
+      element.style.left = pos.x - 8 + "px";
 
-      //   element.style.top = pos.y + "px";
-      //   element.style.left = pos.x + "px";
-
-      //   this.boardCon.append(element);
+      this.boardCon.append(element);
       //   this.stoppedCells.push(obj);
     }
-    // pionek.pionek.style.display = "none";
+    // pionek.pionek.remove();
     this.renderPionek();
   };
   public checkForZbicie(obj: cellObj) {
@@ -73,7 +77,8 @@ export class Game {
 
     const indexes = [indexLeft, indexRight, indexTop, indexBottom];
 
-    const checkInRow = (vectorX: number, vectorY: number) => {
+    const checkInRow = (element: cellObj, vectorX: number, vectorY: number) => {
+      this.cellsToDelete = [element];
       let bool = true;
       for (let index = 1; index < 3; index++) {
         const l = this.cells.findIndex(
@@ -95,6 +100,7 @@ export class Game {
           bool = false;
           break;
         }
+        this.cellsToDelete.push(this.cells[l]);
       }
       return bool;
     };
@@ -110,8 +116,12 @@ export class Game {
 
       // console.log(obj, vectorX, vectorY);
 
-      if (checkInRow(vectorX, vectorY)) {
+      if (checkInRow(obj, vectorX, vectorY)) {
         console.log("znaleziono!", obj.color);
+        this.cellsToDelete.forEach((cell) => {
+          cell.div.style.display = "none";
+          cell.color = "none";
+        });
       }
     });
   }
@@ -165,3 +175,4 @@ export class Game {
     this.pionks.push(pionek);
   }
 }
+//dupa
