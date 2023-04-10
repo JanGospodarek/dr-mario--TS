@@ -183,7 +183,6 @@ import genUniqueId from "./utils/genUniqueId";
 export class Game {
   private boardCon = <HTMLDivElement>document.getElementById("board");
   public pionks: Pionek[] = [];
-  public cells: cellObj[] = [];
   public cellsToDelete: cellObj[] = [];
 
   constructor() {
@@ -197,19 +196,119 @@ export class Game {
         div.classList.add("cell");
         div.style.left = `${20 * x}px`;
         div.style.top = `${20 * y}px`;
-        this.cells.push({
-          x: 20 * x + 8,
-          y: 20 * y + 8,
-          color: "none",
-          id: genUniqueId(),
-          div: null,
-        });
         this.boardCon.append(div);
       }
     }
   }
   private renderPionek() {
-    const pionek = new Pionek(this.boardCon);
+    const pionek = new Pionek(
+      this.boardCon,
+      this.checkBorderPionks,
+      this.renew
+    );
     this.pionks.push(pionek);
+  }
+
+  public renew = (pionek) => {
+    this.checkForZbicie(pionek);
+    this.renderPionek();
+  };
+  public checkBorderPionks = (pionek: Pionek) => {
+    let wynik = false;
+    this.pionks.forEach((element) => {
+      for (const key in pionek.cells) {
+        const pos = pionek.cells[key];
+
+        if (pionek.id == element.id) return;
+        if (
+          (pos.x == element.cells.left.x || pos.x == element.cells.right.x) &&
+          (pos.y == element.cells.left.y - 20 ||
+            pos.y == element.cells.right.y - 20)
+        ) {
+          console.log("duipa!");
+          wynik = true;
+        }
+      }
+    });
+    return wynik;
+  };
+
+  public checkForZbicie(pionek: Pionek) {
+    let cellLeft, cellTop, cellRight, cellBottom;
+    for (const key in pionek.cells) {
+      const cell = pionek.cells[key];
+      this.pionks.forEach((el, i) => {
+        for (const k in el.cells) {
+          const cellToCompare = el.cells[k];
+          if (cellToCompare.x + 20 == cell.x && cellToCompare.y == cell.y) {
+            cellLeft = cellToCompare;
+          }
+          if (cellToCompare.x == cell.x && cellToCompare.y + 20 == cell.y) {
+            cellTop = cellToCompare;
+          }
+          if (cellToCompare.x - 20 == cell.x && cellToCompare.y == cell.y) {
+            cellRight = cellToCompare;
+          }
+          if (cellToCompare.x == cell.x && cellToCompare.y - 20 == cell.y) {
+            cellBottom = cellToCompare;
+          }
+        }
+      });
+      // const indexLeft = this.cells.findIndex(
+      //   (el) => el.x == obj.x - 20 && el.y == obj.y
+      // );
+      // const indexTop = this.cells.findIndex(
+      //   (el) => el.x == obj.x && el.y == obj.y - 20
+      // );
+      // const indexRight = this.cells.findIndex(
+      //   (el) => el.x == obj.x + 20 && el.y == obj.y
+      // );
+      // const indexBottom = this.cells.findIndex(
+      //   (el) => el.x == obj.x && el.y == obj.y + 20
+      // );
+    }
+
+    const indexes = [cellLeft, cellRight, cellTop, cellBottom];
+    //   const checkInRow = (element: cellObj, vectorX: number, vectorY: number) => {
+    //     this.cellsToDelete = [element];
+    //     let bool = true;
+    //     for (let index = 1; index < 3; index++) {
+    //       const l = this.cells.findIndex(
+    //         (el) =>
+    //           el.x == obj.x + vectorX * index && el.y == obj.y + vectorY * index
+    //       );
+    //       // console.log(this.cells[l]);
+    //       if (l == -1) {
+    //         bool = false;
+    //         break;
+    //       }
+    //       if (this.cells[l].div == null) {
+    //         bool = false;
+    //         break;
+    //       }
+    //       if (this.cells[l].color !== obj.color) {
+    //         bool = false;
+    //         break;
+    //       }
+    //       this.cellsToDelete.push(this.cells[l]);
+    //     }
+    //     return bool;
+    //   };
+    //   // console.log(indexes[key]);
+    //   indexes.forEach((e) => {
+    //     if (e == -1) return;
+    //     const element = this.cells[e];
+    //     // if (element.div == null) return;
+    //     const vectorX = obj.x - element.x;
+    //     const vectorY = obj.y - element.y;
+    //     // console.log(obj, vectorX, vectorY);
+    //     if (checkInRow(obj, vectorX, vectorY)) {
+    //       console.log("znaleziono!", obj.color);
+    //       this.cellsToDelete.forEach((cell) => {
+    //         cell.div.style.display = "none";
+    //         cell.color = "none";
+    //       });
+    //     }
+    //   });
   }
 }

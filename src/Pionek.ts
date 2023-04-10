@@ -18,6 +18,7 @@
 //   public rotation = 0;
 
 import { Cells } from "../types/interfaces";
+import genUniqueId from "./utils/genUniqueId";
 
 //   constructor(
 //     boardDiv: HTMLDivElement,
@@ -38,6 +39,7 @@ export class Pionek {
     left: { x: 60, y: 0, div: null },
     right: { x: 80, y: 0, div: null },
   };
+  public id = genUniqueId();
   private movingInterval: any;
   private possibleColors = [
     "#BB8FCE",
@@ -47,12 +49,15 @@ export class Pionek {
     "#E59866",
   ];
   private stop = false;
-  // private checkBorderPionks: Function;
-  // private renewGame: Function;
   private manualMovingDown = false;
   ///
-  constructor(boardDiv: HTMLDivElement) {
+  constructor(
+    boardDiv: HTMLDivElement,
+    private checkBorderPionks: Function,
+    private renewGame: Function
+  ) {
     this.boardDiv = boardDiv;
+
     this.buildPionek();
     this.moving();
     this.addControls();
@@ -69,8 +74,6 @@ export class Pionek {
       cell.style.backgroundColor = this.possibleColors[colorIndex];
 
       cell.classList.add("pionek-cell");
-
-      //   cell.setAttribute("data-position", JSON.stringify(pos));
       this.boardDiv.append(cell);
 
       let key = "";
@@ -85,7 +88,6 @@ export class Pionek {
 
   private getColor(except: number | null) {
     let i = Math.floor(Math.random() * 5);
-
     while (i == except) {
       i = Math.floor(Math.random() * 5);
     }
@@ -95,20 +97,19 @@ export class Pionek {
   private moving() {
     this.movingInterval = setInterval(() => {
       if (this.manualMovingDown) return;
+      if (!this.stop) {
+        this.updateBothCoordinates(
+          undefined,
+          this.cells.left.y + 20,
+          undefined,
+          this.cells.right.y + 20
+        );
+      }
 
-      const newY = 20 + this.cells.left.y;
-      // this.cells.left.y = newY;
-
-      this.updateBothCoordinates(
-        undefined,
-        this.cells.left.y + 20,
-        undefined,
-        this.cells.right.y + 20
-      );
-      // prettier-ignore
       if (this.checkBottomCollision()) {
         clearInterval(this.movingInterval);
-        // this.renewGame(this);
+        this.stop = true;
+        this.renewGame(this);
         return;
       }
     }, 400);
@@ -125,7 +126,11 @@ export class Pionek {
   }
 
   private checkBottomCollision() {
-    if (this.cells.left.y >= 280 || this.cells.right.y >= 280) {
+    if (
+      this.cells.left.y >= 280 ||
+      this.cells.right.y >= 280 ||
+      this.checkBorderPionks(this)
+    ) {
       this.stop = true;
       return true;
     } else {
@@ -162,9 +167,12 @@ export class Pionek {
           break;
         case "ArrowDown":
           // prettier-ignore
-
-          if (this.checkBottomCollision()) break;
           this.manualMovingDown = true;
+
+          if (this.checkBottomCollision()) {
+            this.stop = true;
+            break;
+          }
           this.updateBothCoordinates(
             undefined,
             this.cells.left.y + 20,
