@@ -31,153 +31,7 @@ import { Cells } from "../types/interfaces";
 //     this.renewGame = renew;
 //     this.checkBorderPionks = checkBorderPionks;
 //   }
-//   private getColor(except: number | null) {
-//     let i = Math.floor(Math.random() * 5);
 
-//     while (i == except) {
-//       i = Math.floor(Math.random() * 5);
-//     }
-//     return i;
-//   }
-//   private buildPionek() {
-//     this.pionek = document.createElement("div");
-//     this.pionek.classList.add("pionek");
-//     let fristColor: number | null = null;
-
-//     for (let index = 0; index < 2; index++) {
-//       const cell1 = document.createElement("div");
-
-//       const colorIndex = this.getColor(fristColor);
-//       fristColor = colorIndex;
-//       cell1.style.backgroundColor = this.possibleColors[colorIndex];
-
-//       cell1.classList.add("pionek-cell");
-//       //   const pos = { x: 60, y: 0 };
-//       //   cell1.setAttribute("data-position", JSON.stringify(pos));
-//       this.pionek.append(cell1);
-//     }
-
-//     this.pionek.style.left = "60px";
-//     this.boardDiv.append(this.pionek);
-//   }
-
-//   private moving() {
-//     this.movingInterval = setInterval(() => {
-//       if (this.manualMovingDown) return;
-
-//       const y = 20 + Number(this.pionek.style.top.split("p")[0]);
-
-//       if (this.chechForBorderCollisions(undefined, y, true)) {
-//         clearInterval(this.movingInterval);
-//         this.renewGame(this);
-//         return;
-//       }
-//       this.position.y = y;
-//       this.pionek.style.top = `${y}px`;
-//       //   this.updateDatasets({ x: this.position.x, y: this.position.y });
-//     }, 400);
-//   }
-
-//   private updateDatasets(obj) {
-//     for (let index = 0; index < this.pionek.children.length; index++) {
-//       const element = this.pionek.children[index];
-//       element.setAttribute("data-position", JSON.stringify(obj));
-//     }
-//   }
-
-//   private chechForBorderCollisions(x: any, y: number, autonomous: boolean) {
-//     if (this.checkBorderPionks(this.position, this.rotation)) {
-//       console.log("PIONEK!!!!");
-//       this.stop = true;
-//       return true;
-//     }
-
-//     if (autonomous) {
-//       if (
-//         y >= 300 ||
-//         ((this.rotation == 90 || this.rotation == 270) && y >= 280)
-//       ) {
-//         this.stop = true;
-//         return true;
-//       }
-//     } else {
-//       if (x <= 0 || x >= 160) {
-//         return true;
-//       } else if (
-//         y >= 300 ||
-//         ((this.rotation == 90 || this.rotation == 270) && y >= 280)
-//       ) {
-//         this.stop = true;
-//         return true;
-//       }
-//     }
-//   }
-
-//   private rotate() {
-//     const prevRot = this.rotation;
-//     if (prevRot == 360) this.rotation = 0;
-//     this.rotation += 90;
-//     if (this.rotation == 270 || this.rotation == 90) {
-//       this.position.x += 10;
-//       this.position.y -= 10;
-//       this.pionek.style.left = `${this.position.x}px`;
-//       this.pionek.style.top = `${this.position.y}px`;
-//     }
-//     if (this.rotation == 180 || this.rotation == 360) {
-//       this.position.x -= 10;
-//       this.position.y += 10;
-//       this.pionek.style.top = `${this.position.y}px`;
-//       this.pionek.style.left = `${this.position.x}px`;
-//     }
-//     // this.updateDatasets({ x: this.position.x, y: this.position.y });
-//     this.pionek.style.transform = `rotate(${this.rotation}deg)`;
-//   }
-
-//   private addControls() {
-//     document.addEventListener("keydown", (e: KeyboardEvent) => {
-//       if (this.stop) return;
-//       const key = e.key;
-
-//       const x = +this.pionek.style.left.split("p")[0];
-//       const y = +this.pionek.style.top.split("p")[0];
-
-//       switch (key) {
-//         case "ArrowLeft":
-//           if (!this.chechForBorderCollisions(x, y, false)) {
-//             const span = x - 20;
-//             this.pionek.style.left = `${span}px`;
-//             this.position.x = span;
-//           }
-
-//           break;
-//         case "ArrowRight":
-//           if (!this.chechForBorderCollisions(x + 40, y, false)) {
-//             const span = x + 20;
-//             this.pionek.style.left = `${span}px`;
-//             this.position.x = span;
-//           }
-
-//           break;
-//         case "ArrowDown":
-//           if (!this.chechForBorderCollisions(x, y + 20, false)) {
-//             this.manualMovingDown = true;
-//             const span = y + 20;
-//             this.pionek.style.top = `${span}px`;
-//             this.position.y = span;
-//           }
-
-//           break;
-//         case "r":
-//           this.rotate();
-//       }
-//       //   this.updateDatasets({ x: this.position.x, y: this.position.y });
-//     });
-
-//     document.addEventListener("keyup", (e: KeyboardEvent) => {
-//       if (e.key == "ArrowDown") this.manualMovingDown = false;
-//     });
-//   }
-// }
 export class Pionek {
   private boardDiv: HTMLDivElement;
   public cells: Cells = {
@@ -203,6 +57,7 @@ export class Pionek {
     this.moving();
     this.addControls();
   }
+
   private buildPionek() {
     let fristColor: number | null = null;
 
@@ -244,7 +99,12 @@ export class Pionek {
       const newY = 20 + this.cells.left.y;
       // this.cells.left.y = newY;
 
-      this.updateBothCoordinates(undefined, newY, undefined, newY);
+      this.updateBothCoordinates(
+        undefined,
+        this.cells.left.y + 20,
+        undefined,
+        this.cells.right.y + 20
+      );
       // prettier-ignore
       if (this.checkBottomCollision()) {
         clearInterval(this.movingInterval);
@@ -254,42 +114,18 @@ export class Pionek {
     }, 400);
   }
 
-  // private chechForBorderCollisions(
-  //   y,
-  //   xLeft,
-  //   xRight,
-  //   autonomous: boolean = false
-  // ): boolean {
-  //   // if (this.checkBorderPionks(this.position, this.rotation)) {
-  //   //   console.log("PIONEK!!!!");
-  //   //   this.stop = true;
-  //   //   return true;
-  //   // }
-  //   if (autonomous) {
-  //     if (y >= 280) {
-  //       this.stop = true;
-  //       return true;
-  //     }
-  //   } else {
-  //     if (xLeft <= 0 || xRight >= 140) {
-  //       return true;
-  //     } else if (y >= 280) {
-  //       this.stop = true;
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
   private checkLeftCollision() {
     if (this.cells.left.x <= 0) return true;
     else return false;
   }
+
   private checkRightCollision() {
     if (this.cells.right.x >= 140) return true;
     else return false;
   }
+
   private checkBottomCollision() {
-    if (this.cells.left.y >= 280) {
+    if (this.cells.left.y >= 280 || this.cells.right.y >= 280) {
       this.stop = true;
       return true;
     } else {
@@ -338,7 +174,17 @@ export class Pionek {
 
           break;
         case "r":
-        // this.rotate();
+          const xSpan = this.cells.right.x - this.cells.left.x;
+          const ySpan = this.cells.right.y - this.cells.left.y;
+          this.rotate(xSpan, ySpan);
+
+          break;
+        case "t":
+          const xSpanR = this.cells.left.x - this.cells.right.x;
+          const ySpanR = this.cells.left.y - this.cells.right.y;
+          this.rotate(xSpanR, ySpanR);
+
+          break;
       }
     });
 
@@ -346,7 +192,28 @@ export class Pionek {
       if (e.key == "ArrowDown") this.manualMovingDown = false;
     });
   }
-  updateBothCoordinates(
+
+  private rotate(xSpan, ySpan) {
+    //refactor!
+    if (xSpan == 20 && ySpan == 0) {
+      //prettier-ignore
+      this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-20)
+    }
+    if (xSpan == 0 && ySpan == -20) {
+      //prettier-ignore
+      this.updateBothCoordinates(undefined,undefined,this.cells.left.x-20,this.cells.left.y)
+    }
+    if (xSpan == -20 && ySpan == 0) {
+      //prettier-ignore
+      this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y+20)
+    }
+    if (xSpan == 0 && ySpan == 20) {
+      //prettier-ignore
+      this.updateBothCoordinates(undefined,undefined,this.cells.left.x+20,this.cells.left.y)
+    }
+  }
+
+  private updateBothCoordinates(
     xLeft: number | undefined,
     yLeft: number | undefined,
     xRight: number | undefined,
