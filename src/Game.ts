@@ -1,4 +1,4 @@
-import { cellObj } from "../types/interfaces";
+import { Cell, cellObj } from "../types/interfaces";
 import { Pionek } from "./Pionek";
 import genUniqueId from "./utils/genUniqueId";
 
@@ -183,7 +183,8 @@ import genUniqueId from "./utils/genUniqueId";
 export class Game {
   private boardCon = <HTMLDivElement>document.getElementById("board");
   public pionks: Pionek[] = [];
-  public cellsToDelete: cellObj[] = [];
+  allCells = [];
+  public cellsToDelete: Cell[] = [];
 
   constructor() {
     this.renderBoard();
@@ -196,6 +197,12 @@ export class Game {
         div.classList.add("cell");
         div.style.left = `${20 * x}px`;
         div.style.top = `${20 * y}px`;
+        this.allCells.push(<Cell>{
+          x: 20 * x,
+          y: 20 * y,
+          color: "none",
+          div: null,
+        });
         this.boardCon.append(div);
       }
     }
@@ -210,9 +217,21 @@ export class Game {
   }
 
   public renew = (pionek) => {
+    for (const key in pionek.cells) {
+      const c = pionek.cells[key];
+      const index = this.allCells.findIndex((el) => el.x == c.x && el.y == c.y);
+      this.allCells[index].x = c.x;
+      this.allCells[index].y = c.y;
+      console.log(pionek);
+
+      this.allCells[index].color = c.color;
+      this.allCells[index].div = c.div;
+    }
+
     this.checkForZbicie(pionek);
     this.renderPionek();
   };
+
   public checkBorderPionks = (pionek: Pionek) => {
     let wynik = false;
     this.pionks.forEach((element) => {
@@ -234,81 +253,106 @@ export class Game {
   };
 
   public checkForZbicie(pionek: Pionek) {
-    let cellLeft, cellTop, cellRight, cellBottom;
-    for (const key in pionek.cells) {
-      const cell = pionek.cells[key];
-      this.pionks.forEach((el, i) => {
-        for (const k in el.cells) {
-          const cellToCompare = el.cells[k];
-          if (cellToCompare.x + 20 == cell.x && cellToCompare.y == cell.y) {
-            cellLeft = cellToCompare;
-          }
-          if (cellToCompare.x == cell.x && cellToCompare.y + 20 == cell.y) {
-            cellTop = cellToCompare;
-          }
-          if (cellToCompare.x - 20 == cell.x && cellToCompare.y == cell.y) {
-            cellRight = cellToCompare;
-          }
-          if (cellToCompare.x == cell.x && cellToCompare.y - 20 == cell.y) {
-            cellBottom = cellToCompare;
-          }
+    // let cellLeft, cellTop, cellRight, cellBottom;
+
+    const cells: Cell[] = [];
+    this.pionks.forEach((pionek) => {
+      for (const key in pionek.cells) {
+        cells.push(pionek.cells[key]);
+      }
+    });
+
+    const checkInRow = (element: Cell, vectorX: number, vectorY: number) => {
+      this.cellsToDelete = [element];
+      let bool = true;
+      for (let index = 1; index < 3; index++) {
+        const l = this.allCells.findIndex(
+          (el) =>
+            el.x == element.x + vectorX * index &&
+            el.y == element.y + vectorY * index
+        );
+        console.log(this.allCells[l]);
+
+        if (l == -1) {
+          bool = false;
+          break;
         }
+        if (this.allCells[l].div == null) {
+          bool = false;
+          break;
+        }
+
+        if (this.allCells[l].color !== element.color) {
+          bool = false;
+          break;
+        }
+        this.cellsToDelete.push(this.allCells[l]);
+      }
+      return bool;
+    };
+
+    for (const key in pionek.cells) {
+      const obj = pionek.cells[key];
+
+      const indexLeft = this.allCells.findIndex(
+        (el) => el.x == obj.x - 20 && el.y == obj.y
+      );
+      const indexTop = this.allCells.findIndex(
+        (el) => el.x == obj.x && el.y == obj.y - 20
+      );
+      const indexRight = this.allCells.findIndex(
+        (el) => el.x == obj.x + 20 && el.y == obj.y
+      );
+      const indexBottom = this.allCells.findIndex(
+        (el) => el.x == obj.x && el.y == obj.y + 20
+      );
+      const indexes = [indexLeft, indexRight, indexTop, indexBottom];
+
+      ////////////
+
+      indexes.forEach((element) => {
+        if (element == -1) return;
+        const cellObj: Cell = this.allCells[element];
+
+        if (cellObj.div == null) return;
+        const vectorX = obj.x - cellObj.x;
+        const vectorY = obj.y - cellObj.y;
+        // for (const key in element.cells) {
+        //   const obj = element.cells[key];
+
+        if (checkInRow(obj, vectorX, vectorY)) {
+          console.log("znaleziono!", obj.color);
+          // this.cellsToDelete.forEach((cell) => {
+          //   cell.div.style.display = "none";
+          //   cell.color = "none";
+          // });
+        }
+        // }
       });
-      // const indexLeft = this.cells.findIndex(
-      //   (el) => el.x == obj.x - 20 && el.y == obj.y
-      // );
-      // const indexTop = this.cells.findIndex(
-      //   (el) => el.x == obj.x && el.y == obj.y - 20
-      // );
-      // const indexRight = this.cells.findIndex(
-      //   (el) => el.x == obj.x + 20 && el.y == obj.y
-      // );
-      // const indexBottom = this.cells.findIndex(
-      //   (el) => el.x == obj.x && el.y == obj.y + 20
-      // );
     }
 
-    const indexes = [cellLeft, cellRight, cellTop, cellBottom];
-    //   const checkInRow = (element: cellObj, vectorX: number, vectorY: number) => {
-    //     this.cellsToDelete = [element];
-    //     let bool = true;
-    //     for (let index = 1; index < 3; index++) {
-    //       const l = this.cells.findIndex(
-    //         (el) =>
-    //           el.x == obj.x + vectorX * index && el.y == obj.y + vectorY * index
-    //       );
-    //       // console.log(this.cells[l]);
-    //       if (l == -1) {
-    //         bool = false;
-    //         break;
+    // for (const key in pionek.cells) {
+    //   const cell = pionek.cells[key];
+    //   this.pionks.forEach((el, i) => {
+    //     for (const k in el.cells) {
+    //       const cellToCompare = el.cells[k];
+    //       if (cellToCompare.x + 20 == cell.x && cellToCompare.y == cell.y) {
+    //         cellLeft = cellToCompare;
     //       }
-    //       if (this.cells[l].div == null) {
-    //         bool = false;
-    //         break;
+    //       if (cellToCompare.x == cell.x && cellToCompare.y + 20 == cell.y) {
+    //         cellTop = cellToCompare;
     //       }
-    //       if (this.cells[l].color !== obj.color) {
-    //         bool = false;
-    //         break;
+    //       if (cellToCompare.x - 20 == cell.x && cellToCompare.y == cell.y) {
+    //         cellRight = cellToCompare;
     //       }
-    //       this.cellsToDelete.push(this.cells[l]);
-    //     }
-    //     return bool;
-    //   };
-    //   // console.log(indexes[key]);
-    //   indexes.forEach((e) => {
-    //     if (e == -1) return;
-    //     const element = this.cells[e];
-    //     // if (element.div == null) return;
-    //     const vectorX = obj.x - element.x;
-    //     const vectorY = obj.y - element.y;
-    //     // console.log(obj, vectorX, vectorY);
-    //     if (checkInRow(obj, vectorX, vectorY)) {
-    //       console.log("znaleziono!", obj.color);
-    //       this.cellsToDelete.forEach((cell) => {
-    //         cell.div.style.display = "none";
-    //         cell.color = "none";
-    //       });
+    //       if (cellToCompare.x == cell.x && cellToCompare.y - 20 == cell.y) {
+    //         cellBottom = cellToCompare;
+    //       }
     //     }
     //   });
+    // const indexes: Pionek[] = [cellLeft, cellRight, cellTop, cellBottom];
+    // console.log(indexes);
+
+    // }
   }
 }

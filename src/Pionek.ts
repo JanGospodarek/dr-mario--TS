@@ -36,10 +36,11 @@ import genUniqueId from "./utils/genUniqueId";
 export class Pionek {
   private boardDiv: HTMLDivElement;
   public cells: Cells = {
-    left: { x: 60, y: 0, div: null },
-    right: { x: 80, y: 0, div: null },
+    left: { x: 60, y: 0, div: null, color: "none" },
+    right: { x: 80, y: 0, div: null, color: "none" },
   };
   public id = genUniqueId();
+
   private movingInterval: any;
   private possibleColors = [
     "#BB8FCE",
@@ -83,6 +84,7 @@ export class Pionek {
       cell.style.top = this.cells[key].y + "px";
 
       this.cells[key].div = cell;
+      this.cells[key].color = this.possibleColors[colorIndex];
     }
   }
 

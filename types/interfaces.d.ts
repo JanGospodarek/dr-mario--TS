@@ -6,6 +6,12 @@ export interface cellObj {
   div: HTMLElement | null;
 }
 export interface Cells {
-  left: { x: number; y: number; div: HTMLDivElement | null };
-  right: { x: number; y: number; div: HTMLDivElement | null };
+  left: Cell;
+  right: Cell;
+}
+export interface Cell {
+  x: number;
+  y: number;
+  div: HTMLDivElement | null;
+  color: string;
 }
