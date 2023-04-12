@@ -14,4 +14,5 @@ export interface Cell {
   y: number;
   div: HTMLDivElement | null;
   color: string;
+  flag: string;
 }

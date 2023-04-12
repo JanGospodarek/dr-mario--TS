@@ -1,47 +1,13 @@
-// export class Pionek {
-//   private boardDiv: HTMLDivElement;
-//   public pionek!: HTMLDivElement;
-//   private movingInterval: any;
-//   private possibleColors = [
-//     "#BB8FCE",
-//     "#85C1E9",
-//     "#F7DC6F",
-//     "#F1948A",
-//     "#E59866",
-//   ];
-//   private stop = false;
-//   private checkBorderPionks: Function;
-//   private renewGame: Function;
-//   private manualMovingDown = false;
-//   ///
-//   public position = { x: 60, y: 0 };
-//   public rotation = 0;
-
 import { Cells } from "../types/interfaces";
 import genUniqueId from "./utils/genUniqueId";
 
-//   constructor(
-//     boardDiv: HTMLDivElement,
-//     renew: Function,
-//     checkBorderPionks: Function
-//   ) {
-//     this.boardDiv = boardDiv;
-//     this.buildPionek();
-//     this.moving();
-//     this.addControls();
-//     this.renewGame = renew;
-//     this.checkBorderPionks = checkBorderPionks;
-//   }
-
 export class Pionek {
   private boardDiv: HTMLDivElement;
-  public cells: Cells = {
-    left: { x: 60, y: 0, div: null, color: "none" },
-    right: { x: 80, y: 0, div: null, color: "none" },
-  };
+  private btn = <HTMLDivElement>document.getElementById("stop");
   public id = genUniqueId();
-
   private movingInterval: any;
+  private stop = false;
+  private manualMovingDown = false;
   private possibleColors = [
     "#BB8FCE",
     "#85C1E9",
@@ -49,19 +15,24 @@ export class Pionek {
     "#F1948A",
     "#E59866",
   ];
-  private stop = false;
-  private manualMovingDown = false;
-  ///
+  public cells: Cells = {
+    left: { x: 60, y: 0, div: null, color: "none", flag: "working" },
+    right: { x: 80, y: 0, div: null, color: "none", flag: "working" },
+  };
+
   constructor(
     boardDiv: HTMLDivElement,
     private checkBorderPionks: Function,
     private renewGame: Function
   ) {
     this.boardDiv = boardDiv;
-
     this.buildPionek();
     this.moving();
     this.addControls();
+    ///development proposes
+    this.btn.addEventListener("click", () => {
+      clearInterval(this.movingInterval);
+    });
   }
 
   private buildPionek() {
