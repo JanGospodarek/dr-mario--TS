@@ -4,12 +4,15 @@ import genUniqueId from "./utils/genUniqueId";
 
 export class Game {
   private boardCon = <HTMLDivElement>document.getElementById("board");
+  private scoreCon = <HTMLDivElement>document.getElementById("score");
   public pionks: Pionek[] = [];
-  allCells = [];
+  private allCells = [];
+  public score = 0;
   public cellsToDelete: Cell[] = [];
   constructor() {
     this.renderBoard();
     this.renderPionek();
+    this.scoreCon.innerText = "0".repeat(8);
   }
 
   private renderBoard() {
@@ -85,7 +88,6 @@ export class Game {
             el.x == element.x - vectorX * index &&
             el.y == element.y - vectorY * index
         );
-        console.log(this.allCells[l]);
 
         if (l == -1) {
           bool = false;
@@ -132,20 +134,13 @@ export class Game {
         const vectorX = obj.x - cellObj.x;
         const vectorY = obj.y - cellObj.y;
 
-        console.log(
-          element,
-          "index",
-          i,
-          "vectorx: ",
-          vectorX,
-          "vectory: ",
-          vectorY
-        );
-
         if (checkInRow(obj, vectorX, vectorY)) {
           console.log("znaleziono!", obj.color);
+          this.score += 1000;
+          this.renderScore();
           this.cellsToDelete.forEach((cell) => {
             cell.div.remove();
+            cell.div = null;
             cell.color = "none";
             cell.flag = "zbite";
             this.spadamyPanowie();
@@ -160,22 +155,45 @@ export class Game {
       opadlo = false;
       for (let index = this.allCells.length - 1; index > 0; index--) {
         const cell: Cell = this.allCells[index];
+
         const indexBelow = this.allCells.findIndex(
           (el) => el.x == cell.x && el.y - 20 == cell.y
         );
-        if (indexBelow == -1) return;
+
+        if (indexBelow == -1) break;
         const cellBellow = this.allCells[indexBelow];
+        console.log(cellBellow);
+
         if (cellBellow.flag == "zbite") {
           //zejdz w dol
+          console.log(";c");
+
+          cell.flag = "zbite";
+          cellBellow.flag = "normal";
+
+          cellBellow.div = cell.div;
+          cell.div = null;
+
           opadlo = true;
         }
         if (opadlo) {
           opadanie();
         } else {
           //update interface
+          this.reRender();
         }
       }
     };
     opadanie();
+  }
+
+  reRender() {
+    this.allCells.forEach((cell) => {
+      if (cell.div == null) return;
+      cell.div.style.top = cell.x + "px";
+    });
+  }
+  renderScore() {
+    this.scoreCon.innerText = String(this.score).padStart(8, "0");
   }
 }

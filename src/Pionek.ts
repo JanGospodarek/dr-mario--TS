@@ -3,7 +3,7 @@ import genUniqueId from "./utils/genUniqueId";
 
 export class Pionek {
   private boardDiv: HTMLDivElement;
-  private btn = <HTMLDivElement>document.getElementById("stop");
+  // private btn = <HTMLDivElement>document.getElementById("stop");
   public id = genUniqueId();
   private movingInterval: any;
   private stop = false;
@@ -16,8 +16,8 @@ export class Pionek {
     "#E59866",
   ];
   public cells: Cells = {
-    left: { x: 60, y: 0, div: null, color: "none", flag: "working" },
-    right: { x: 80, y: 0, div: null, color: "none", flag: "working" },
+    left: { x: 60, y: 0, div: null, color: "none", flag: "normal" },
+    right: { x: 80, y: 0, div: null, color: "none", flag: "normal" },
   };
 
   constructor(
@@ -30,9 +30,9 @@ export class Pionek {
     this.moving();
     this.addControls();
     ///development proposes
-    this.btn.addEventListener("click", () => {
-      clearInterval(this.movingInterval);
-    });
+    // this.btn.addEventListener("click", () => {
+    //   clearInterval(this.movingInterval);
+    // });
   }
 
   private buildPionek() {
