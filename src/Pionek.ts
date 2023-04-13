@@ -39,8 +39,9 @@ export class Pionek {
     for (let index = 0; index < 2; index++) {
       const cell = document.createElement("div");
 
-      const colorIndex = this.getColor(fristColor);
-      fristColor = colorIndex;
+      // const colorIndex = this.getColor(fristColor);
+      // fristColor = colorIndex;
+      const colorIndex = this.getColor();
       cell.style.backgroundColor = this.possibleColors[colorIndex];
       cell.innerText = String(index);
       cell.classList.add("pionek-cell");
@@ -57,14 +58,16 @@ export class Pionek {
     }
   }
 
-  private getColor(except: number | null) {
-    let i = Math.floor(Math.random() * 5);
-    while (i == except) {
-      i = Math.floor(Math.random() * 5);
-    }
-    return i;
+  // private getColor(except: number | null) {
+  //   let i = Math.floor(Math.random() * 5);
+  //   while (i == except) {
+  //     i = Math.floor(Math.random() * 5);
+  //   }
+  //   return i;
+  // }
+  private getColor() {
+    return Math.floor(Math.random() * 5);
   }
-
   private moving() {
     this.movingInterval = setInterval(() => {
       if (this.manualMovingDown) return;
@@ -174,8 +177,6 @@ export class Pionek {
 
   private rotate(xSpan, ySpan, letter) {
     //refactor!
-    console.log(letter == "t");
-
     if (letter == "r") {
       if (xSpan == 20 && ySpan == 0) {
         //prettier-ignore
@@ -185,40 +186,38 @@ export class Pionek {
       if (xSpan == 0 && ySpan == -20) {
         //prettier-ignore
         // this.updateBothCoordinates(undefined,undefined,this.cells.left.x-20,this.cells.left.y)
-        this.updateBothCoordinates(this.cells.left.x+20,this.cells.left.y,this.cells.right.x,this.cells.right.y+20)
+
+        this.updateBothCoordinates(
+          this.cells.left.x + 20,
+          this.cells.left.y,
+          this.cells.right.x,
+          this.cells.right.y + 20
+        );
       }
       if (xSpan == -20 && ySpan == 0) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y+20)
         this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-20,undefined,undefined)
       }
       if (xSpan == 0 && ySpan == 20) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x+20,this.cells.left.y)
         this.updateBothCoordinates(this.cells.left.x,this.cells.left.y+20,this.cells.left.x+20,this.cells.right.y)
       }
     }
     if (letter == "t") {
-      console.log("t");
-
       if (xSpan == 20 && ySpan == 0) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-20)
         this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-20,undefined,undefined)
       }
       if (xSpan == 0 && ySpan == -20) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x-20,this.cells.left.y)
         this.updateBothCoordinates(this.cells.left.x-20,this.cells.left.y,this.cells.right.x,this.cells.right.y+20)
       }
       if (xSpan == -20 && ySpan == 0) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y+20)
         this.updateBothCoordinates(this.cells.left.x,this.cells.left.y,this.cells.right.x+20,this.cells.left.y-20)
       }
       if (xSpan == 0 && ySpan == 20) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x+20,this.cells.left.y)
         this.updateBothCoordinates(this.cells.left.x,this.cells.right.y,this.cells.right.x-20,this.cells.right.y)
       }
     }
