@@ -1,14 +1,14 @@
-import { Cell, cellObj } from "../types/interfaces";
+import { Cell, GameInter, cellObj } from "../types/interfaces";
 import { Pionek } from "./Pionek";
 import genUniqueId from "./utils/genUniqueId";
 
-export class Game {
-  private boardCon = <HTMLDivElement>document.getElementById("board");
-  private scoreCon = <HTMLDivElement>document.getElementById("score");
-  public pionks: Pionek[] = [];
-  private allCells = [];
-  public score = 0;
-  public cellsToDelete: Cell[] = [];
+export class Game implements GameInter {
+  boardCon = <HTMLDivElement>document.getElementById("board");
+  scoreCon = <HTMLDivElement>document.getElementById("score");
+  pionks: Pionek[] = [];
+  allCells: Cell[] = [];
+  score = 0;
+  cellsToDelete: Cell[] = [];
   constructor() {
     this.renderBoard();
     this.renderPionek();
@@ -78,7 +78,7 @@ export class Game {
     return wynik;
   };
 
-  public checkForZbicie(pionek: Pionek) {
+  private checkForZbicie(pionek: Pionek) {
     const checkInRow = (element: Cell, vectorX: number, vectorY: number) => {
       this.cellsToDelete = [element];
       let bool = true;
@@ -149,31 +149,31 @@ export class Game {
       });
     }
   }
-  spadamyPanowie() {
-    let opadlo = false;
+  private spadamyPanowie() {
+    let opadlo;
     const opadanie = () => {
       opadlo = false;
       for (let index = this.allCells.length - 1; index > 0; index--) {
         const cell: Cell = this.allCells[index];
-
+        if (cell.div == null) continue;
         const indexBelow = this.allCells.findIndex(
           (el) => el.x == cell.x && el.y - 20 == cell.y
         );
 
-        if (indexBelow == -1) break;
+        if (indexBelow == -1) continue;
+
         const cellBellow = this.allCells[indexBelow];
-        console.log(cellBellow);
 
         if (cellBellow.flag == "zbite") {
           //zejdz w dol
           console.log(";c");
 
-          cell.flag = "zbite";
+          // cell.flag = "normal";
           cellBellow.flag = "normal";
-
+          cellBellow.color = cell.color;
+          cell.color = "none";
           cellBellow.div = cell.div;
           cell.div = null;
-
           opadlo = true;
         }
         if (opadlo) {
@@ -187,13 +187,13 @@ export class Game {
     opadanie();
   }
 
-  reRender() {
+  private reRender() {
     this.allCells.forEach((cell) => {
       if (cell.div == null) return;
       cell.div.style.top = cell.x + "px";
     });
   }
-  renderScore() {
+  private renderScore() {
     this.scoreCon.innerText = String(this.score).padStart(8, "0");
   }
 }

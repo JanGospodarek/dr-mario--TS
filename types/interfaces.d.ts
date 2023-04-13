@@ -16,3 +16,21 @@ export interface Cell {
   color: string;
   flag: string;
 }
+// export interface PionekInter {
+//   boardDiv: HTMLDivElement;
+//   btn: HTMLDivElement;
+//   id: string;
+//   movingInterval: any;
+//   stop: boolean;
+//   manualMovingDown: boolean;
+//   possibleColors: string[];
+//   cells: Cells;
+// }
+export interface GameInter {
+  boardCon: HTMLDivElement;
+  scoreCon: x;
+  pionks: Pionek[];
+  allCells: Cell[];
+  score: number;
+  cellsToDelete: Cell[];
+}
