@@ -7,13 +7,7 @@ export class Pionek {
   private movingInterval: any;
   private stop = false;
   private manualMovingDown = false;
-  private possibleColors = [
-    "#BB8FCE",
-    "#85C1E9",
-    "#F7DC6F",
-    "#F1948A",
-    "#E59866",
-  ];
+  private possibleColors = ["#BB8FCE", "#85C1E9", "#F7DC6F", "#F1948A"];
   cells: Cells = {
     left: { x: 60, y: 0, div: null, color: "none", flag: "normal" },
     right: { x: 80, y: 0, div: null, color: "none", flag: "normal" },
@@ -66,7 +60,7 @@ export class Pionek {
   //   return i;
   // }
   private getColor() {
-    return Math.floor(Math.random() * 5);
+    return Math.floor(Math.random() * 4);
   }
   private moving() {
     this.movingInterval = setInterval(() => {

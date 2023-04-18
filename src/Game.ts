@@ -8,10 +8,13 @@ export class Game implements GameInter {
   pionks: Pionek[] = [];
   allCells: Cell[] = [];
   score = 0;
+  private possibleColors = ["#BB8FCE", "#85C1E9", "#F7DC6F", "#F1948A"];
   cellsToDelete: Cell[] = [];
+  gameId = genUniqueId();
   constructor() {
     this.renderBoard();
     this.renderPionek();
+    this.renderViruses();
     this.scoreCon.innerText = "0".repeat(8);
   }
 
@@ -28,7 +31,9 @@ export class Game implements GameInter {
           y: 20 * y,
           color: "none",
           div: null,
+          flag: "normal",
         });
+
         this.boardCon.append(div);
       }
     }
@@ -41,6 +46,31 @@ export class Game implements GameInter {
       this.renew
     );
     this.pionks.push(pionek);
+  }
+
+  private renderViruses() {
+    const indexes = [];
+    while (indexes.length < 4) {
+      const index = Math.floor(Math.random() * 100);
+      if (indexes.indexOf(index) === -1) indexes.push(index);
+    }
+    indexes.forEach((index, i) => {
+      const div = document.createElement("div");
+
+      div.classList.add("cell");
+      div.style.left = `${this.allCells[index].x}px`;
+      div.style.top = `${this.allCells[index].y}px`;
+      div.style.backgroundColor = this.possibleColors[i];
+      // div.style.backgroundColor = "black";
+      console.log(div);
+
+      this.boardCon.append(div);
+
+      this.allCells[index].flag = "virus";
+      this.allCells[index].color = this.possibleColors[i];
+      this.allCells[index].div = div;
+      console.log(this.allCells[index]);
+    });
   }
 
   public renew = (pionek) => {
@@ -80,8 +110,6 @@ export class Game implements GameInter {
           pos.y + 20 == element.y &&
           element.div !== null
         ) {
-          console.log(element, pos);
-
           wynik = true;
         }
       }
@@ -148,18 +176,27 @@ export class Game implements GameInter {
 
         if (checkInRow(obj, vectorX, vectorY)) {
           console.log("znaleziono!", obj.color);
-          this.score += 1000;
-          this.renderScore();
+
+          const indexOfVirus = this.cellsToDelete.findIndex(
+            (el) => el.flag == "virus"
+          );
+          if (indexOfVirus !== -1) {
+            this.score += 100;
+            localStorage.setItem(this.gameId, String(this.score));
+            this.renderScore();
+          }
+
           this.cellsToDelete.forEach((cell) => {
             const index = this.allCells.findIndex(
               (el) => el.x == cell.x && el.y == cell.y
             );
             const cellToDelete = this.allCells[index];
+
             cellToDelete.div.remove();
             cellToDelete.div = null;
             cellToDelete.color = "none";
             cellToDelete.flag = "zbite";
-            // this.pionks.findIndex(el=>el.cells.left.x==cell.x&&el.cells.left.y==cell.y||)
+
             this.spadamyPanowie();
           });
         }
