@@ -60,16 +60,28 @@ export class Game implements GameInter {
 
   public checkBorderPionks = (pionek: Pionek) => {
     let wynik = false;
-    this.pionks.forEach((element) => {
+    this.allCells.forEach((element) => {
       for (const key in pionek.cells) {
         const pos = pionek.cells[key];
 
-        if (pionek.id == element.id) return;
+        // if (pionek.id == element.id) return;
+        // if (
+        //   (pos.x == element.cells.left.x || pos.x == element.cells.right.x) &&
+        //   (pos.y == element.cells.left.y - 20 ||
+        //     pos.y == element.cells.right.y - 20)
+        // ) {
+        //   wynik = true;
+        // }
+        // console.log(pos.div == element.div);
+
+        // if (pos.div == element.div) return;
         if (
-          (pos.x == element.cells.left.x || pos.x == element.cells.right.x) &&
-          (pos.y == element.cells.left.y - 20 ||
-            pos.y == element.cells.right.y - 20)
+          pos.x == element.x &&
+          pos.y + 20 == element.y &&
+          element.div !== null
         ) {
+          console.log(element, pos);
+
           wynik = true;
         }
       }
@@ -139,10 +151,15 @@ export class Game implements GameInter {
           this.score += 1000;
           this.renderScore();
           this.cellsToDelete.forEach((cell) => {
-            cell.div.remove();
-            cell.div = null;
-            cell.color = "none";
-            cell.flag = "zbite";
+            const index = this.allCells.findIndex(
+              (el) => el.x == cell.x && el.y == cell.y
+            );
+            const cellToDelete = this.allCells[index];
+            cellToDelete.div.remove();
+            cellToDelete.div = null;
+            cellToDelete.color = "none";
+            cellToDelete.flag = "zbite";
+            // this.pionks.findIndex(el=>el.cells.left.x==cell.x&&el.cells.left.y==cell.y||)
             this.spadamyPanowie();
           });
         }
@@ -150,41 +167,37 @@ export class Game implements GameInter {
     }
   }
   private spadamyPanowie() {
-    let opadlo;
-    const opadanie = () => {
-      opadlo = false;
-      for (let index = this.allCells.length - 1; index > 0; index--) {
-        const cell: Cell = this.allCells[index];
-        if (cell.div == null) continue;
-        const indexBelow = this.allCells.findIndex(
-          (el) => el.x == cell.x && el.y - 20 == cell.y
-        );
-
-        if (indexBelow == -1) continue;
-
-        const cellBellow = this.allCells[indexBelow];
-
-        if (cellBellow.flag == "zbite") {
-          //zejdz w dol
-          console.log(";c");
-
-          // cell.flag = "normal";
-          cellBellow.flag = "normal";
-          cellBellow.color = cell.color;
-          cell.color = "none";
-          cellBellow.div = cell.div;
-          cell.div = null;
-          opadlo = true;
-        }
-        if (opadlo) {
-          opadanie();
-        } else {
-          //update interface
-          this.reRender();
-        }
-      }
-    };
-    opadanie();
+    // let opadlo;
+    // const opadanie = () => {
+    //   opadlo = false;
+    //   for (let index = this.allCells.length - 1; index > 0; index--) {
+    //     const cell: Cell = this.allCells[index];
+    //     if (cell.div == null) continue;
+    //     const indexBelow = this.allCells.findIndex(
+    //       (el) => el.x == cell.x && el.y - 20 == cell.y
+    //     );
+    //     if (indexBelow == -1) continue;
+    //     const cellBellow = this.allCells[indexBelow];
+    //     if (cellBellow.flag == "zbite") {
+    //       //zejdz w dol
+    //       console.log(";c");
+    //       // cell.flag = "normal";
+    //       cellBellow.flag = "normal";
+    //       cellBellow.color = cell.color;
+    //       cell.color = "none";
+    //       cellBellow.div = cell.div;
+    //       cell.div = null;
+    //       opadlo = true;
+    //     }
+    //     if (opadlo) {
+    //       opadanie();
+    //     } else {
+    //       //update interface
+    //       this.reRender();
+    //     }
+    //   }
+    // };
+    // opadanie();
   }
 
   // checkBordersOnRotation = (
