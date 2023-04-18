@@ -6,6 +6,7 @@
 }
 #board {
   position: absolute;
+  top: 50px;
   margin: 20px;
   width: 160px;
   height: 300px;

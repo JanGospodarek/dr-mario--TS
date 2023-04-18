@@ -5,17 +5,21 @@ import genUniqueId from "./utils/genUniqueId";
 export class Game implements GameInter {
   boardCon = <HTMLDivElement>document.getElementById("board");
   scoreCon = <HTMLDivElement>document.getElementById("score");
+  bestScoreCon = <HTMLDivElement>document.getElementById("bestScore");
   pionks: Pionek[] = [];
   allCells: Cell[] = [];
   score = 0;
+  bestScore = 0;
   private possibleColors = ["#BB8FCE", "#85C1E9", "#F7DC6F", "#F1948A"];
   cellsToDelete: Cell[] = [];
   gameId = genUniqueId();
   constructor() {
+    this.bestScore = +localStorage.getItem("best");
+
     this.renderBoard();
     this.renderPionek();
     this.renderViruses();
-    this.scoreCon.innerText = "0".repeat(8);
+    this.renderScore();
   }
 
   private renderBoard() {
@@ -51,7 +55,7 @@ export class Game implements GameInter {
   private renderViruses() {
     const indexes = [];
     while (indexes.length < 4) {
-      const index = Math.floor(Math.random() * 100);
+      const index = 40 + Math.floor(Math.random() * 60);
       if (indexes.indexOf(index) === -1) indexes.push(index);
     }
     indexes.forEach((index, i) => {
@@ -177,14 +181,7 @@ export class Game implements GameInter {
         if (checkInRow(obj, vectorX, vectorY)) {
           console.log("znaleziono!", obj.color);
 
-          const indexOfVirus = this.cellsToDelete.findIndex(
-            (el) => el.flag == "virus"
-          );
-          if (indexOfVirus !== -1) {
-            this.score += 100;
-            localStorage.setItem(this.gameId, String(this.score));
-            this.renderScore();
-          }
+          this.checkIfVirusWasKilled();
 
           this.cellsToDelete.forEach((cell) => {
             const index = this.allCells.findIndex(
@@ -203,6 +200,18 @@ export class Game implements GameInter {
       });
     }
   }
+  private checkIfVirusWasKilled() {
+    const indexOfVirus = this.cellsToDelete.findIndex(
+      (el) => el.flag == "virus"
+    );
+    if (indexOfVirus !== -1) {
+      this.score += 100;
+      if (this.score > this.bestScore) this.bestScore = this.score;
+      localStorage.setItem("best", String(this.score));
+      this.renderScore();
+    }
+  }
+
   private spadamyPanowie() {
     // let opadlo;
     // const opadanie = () => {
@@ -267,5 +276,6 @@ export class Game implements GameInter {
   }
   private renderScore() {
     this.scoreCon.innerText = String(this.score).padStart(8, "0");
+    this.bestScoreCon.innerText = String(this.bestScore).padStart(8, "0");
   }
 }
