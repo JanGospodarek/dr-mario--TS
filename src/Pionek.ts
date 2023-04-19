@@ -1,4 +1,4 @@
-import { Cells } from "../types/interfaces";
+import { Cells, Cell } from "../types/interfaces";
 import genUniqueId from "./utils/genUniqueId";
 
 export class Pionek {
@@ -16,7 +16,8 @@ export class Pionek {
   constructor(
     private boardDiv: HTMLDivElement,
     private checkBorderPionks: Function,
-    private renewGame: Function
+    private renewGame: Function,
+    private checkCollisionsOnMove: Function
   ) {
     this.buildPionek();
     this.moving();
@@ -84,13 +85,31 @@ export class Pionek {
   }
 
   private checkLeftCollision() {
-    if (this.cells.left.x <= 0) return true;
-    else return false;
+    let wynik1,
+      wynik2 = false;
+    for (const key in this.cells) {
+      const cell: Cell = this.cells[key];
+      if (this.checkCollisionsOnMove(cell.x - 20, cell.y)) {
+        wynik1 = true;
+      }
+    }
+
+    if (this.cells.left.x <= 0) wynik2 = true;
+    return wynik1 || wynik2;
   }
 
   private checkRightCollision() {
-    if (this.cells.right.x >= 140) return true;
-    else return false;
+    let wynik1,
+      wynik2 = false;
+    for (const key in this.cells) {
+      const cell: Cell = this.cells[key];
+      if (this.checkCollisionsOnMove(cell.x + 20, cell.y)) {
+        wynik1 = true;
+      }
+    }
+
+    if (this.cells.left.x >= 140) wynik2 = true;
+    return wynik1 || wynik2;
   }
 
   private checkBottomCollision() {
@@ -114,6 +133,7 @@ export class Pionek {
         case "ArrowLeft":
           // prettier-ignore
           if (this.checkLeftCollision()) break;
+
           this.updateBothCoordinates(
             this.cells.left.x - 20,
             undefined,
@@ -124,7 +144,7 @@ export class Pionek {
           break;
         case "ArrowRight":
           // prettier-ignore
-          if (this.checkRightCollision()) break;
+          if (this.checkRightCollision() ) break;
           this.updateBothCoordinates(
             this.cells.left.x + 20,
             undefined,

@@ -19,24 +19,24 @@ export class Game implements GameInter {
   constructor() {
     this.bestScore = +localStorage.getItem("best");
 
-    fetch("./data/animations.json")
-      .then((res) => res.json())
-      .then((data) => {
-        // let imgsArray = []; // tablica z animacjami
-        // let anim = function () {
-        //     for (let i = 0; i < imgsArray.length; i++) imgsArray[i].goAnim()
-        //     window.requestAnimationFrame(anim); // z definicji 60 klatek/s
-        // }
+    // fetch("./data/animations.json")
+    //   .then((res) => res.json())
+    //   .then((data) => {
+    //     // let imgsArray = []; // tablica z animacjami
+    //     // let anim = function () {
+    //     //     for (let i = 0; i < imgsArray.length; i++) imgsArray[i].goAnim()
+    //     //     window.requestAnimationFrame(anim); // z definicji 60 klatek/s
+    //     // }
 
-        this.img = new Image();
-        this.img.src = "./img/spritesheet.png";
-        this.img.onload = () => {
-          this.boardGraphicCoords = data.board.pos;
-          // imgsArray.push(new Anim(this, data.blue, "blue"));
-          // imgsArray.push(new Anim(this, data.yellow, "yellow"))
-          // anim();
-        };
-      });
+    //     this.img = new Image();
+    //     this.img.src = "./img/spritesheet.png";
+    //     this.img.onload = () => {
+    //       this.boardGraphicCoords = data.board.pos;
+    //       // imgsArray.push(new Anim(this, data.blue, "blue"));
+    //       // imgsArray.push(new Anim(this, data.yellow, "yellow"))
+    //       // anim();
+    //     };
+    //   });
     this.renderBoard();
     this.renderPionek();
     this.renderViruses();
@@ -62,36 +62,43 @@ export class Game implements GameInter {
         this.boardCon.append(div);
       }
     }
-    //drawing graphics
-    let canvas = document.createElement("canvas");
-    canvas.width = 96;
-    canvas.height = 72;
-    let ctx = canvas.getContext("2d");
-    ctx.drawImage(
-      this.img,
-      this.boardGraphicCoords.x0,
-      this.boardGraphicCoords.y0,
-      this.boardGraphicCoords.w,
-      this.boardGraphicCoords.h,
-      0,
-      0,
-      this.boardGraphicCoords.w,
-      this.boardGraphicCoords.h
-    );
-    let url = canvas.toDataURL();
-    let dest = document.getElementById(this.destId);
-    dest.style.backgroundImage = "url('" + url + "')";
+    // //drawing graphics
+    // let canvas = document.createElement("canvas");
+    // canvas.width = 96;
+    // canvas.height = 72;
+    // let ctx = canvas.getContext("2d");
+    // ctx.drawImage(
+    //   this.img,
+    //   this.boardGraphicCoords.x0,
+    //   this.boardGraphicCoords.y0,
+    //   this.boardGraphicCoords.w,
+    //   this.boardGraphicCoords.h,
+    //   0,
+    //   0,
+    //   this.boardGraphicCoords.w,
+    //   this.boardGraphicCoords.h
+    // );
+    // let url = canvas.toDataURL();
+    // let dest = document.getElementById(this.destId);
+    // dest.style.backgroundImage = "url('" + url + "')";
   }
 
   private renderPionek() {
     const pionek = new Pionek(
       this.boardCon,
       this.checkBorderPionks,
-      this.renew
+      this.renew,
+      this.checkCollisionsOnMove
     );
     this.pionks.push(pionek);
   }
-
+  private checkCollisionsOnMove = (x, y) => {
+    const index = this.allCells.findIndex(
+      (el) => el.x == x && el.y == y && el.div !== null
+    );
+    if (index == -1) return false;
+    else return true;
+  };
   private renderViruses() {
     const indexes = [];
     while (indexes.length < 4) {
