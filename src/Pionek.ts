@@ -5,12 +5,15 @@ export class Pionek {
   private btn = <HTMLDivElement>document.getElementById("stop");
   id = genUniqueId();
   private movingInterval: any;
+  CELL_WIDTH = 17;
+  BOARD_WIDTH = 135;
+  BOARD_HEIGHT = 255;
   private stop = false;
   private manualMovingDown = false;
   private possibleColors = ["#BB8FCE", "#85C1E9", "#F7DC6F", "#F1948A"];
   cells: Cells = {
-    left: { x: 60, y: 0, div: null, color: "none", flag: "normal" },
-    right: { x: 80, y: 0, div: null, color: "none", flag: "normal" },
+    left: { x: 51, y: 0, div: null, color: "none", flag: "normal" },
+    right: { x: 68, y: 0, div: null, color: "none", flag: "normal" },
   };
 
   constructor(
@@ -69,9 +72,9 @@ export class Pionek {
       if (!this.stop) {
         this.updateBothCoordinates(
           undefined,
-          this.cells.left.y + 20,
+          this.cells.left.y + this.CELL_WIDTH,
           undefined,
-          this.cells.right.y + 20
+          this.cells.right.y + this.CELL_WIDTH
         );
       }
 
@@ -89,7 +92,7 @@ export class Pionek {
       wynik2 = false;
     for (const key in this.cells) {
       const cell: Cell = this.cells[key];
-      if (this.checkCollisionsOnMove(cell.x - 20, cell.y)) {
+      if (this.checkCollisionsOnMove(cell.x - this.CELL_WIDTH, cell.y)) {
         wynik1 = true;
       }
     }
@@ -103,19 +106,19 @@ export class Pionek {
       wynik2 = false;
     for (const key in this.cells) {
       const cell: Cell = this.cells[key];
-      if (this.checkCollisionsOnMove(cell.x + 20, cell.y)) {
+      if (this.checkCollisionsOnMove(cell.x + this.CELL_WIDTH, cell.y)) {
         wynik1 = true;
       }
     }
 
-    if (this.cells.left.x >= 140) wynik2 = true;
+    if (this.cells.left.x >= this.BOARD_WIDTH - this.CELL_WIDTH) wynik2 = true;
     return wynik1 || wynik2;
   }
 
   private checkBottomCollision() {
     if (
-      this.cells.left.y >= 280 ||
-      this.cells.right.y >= 280 ||
+      this.cells.left.y >= this.BOARD_HEIGHT - this.CELL_WIDTH ||
+      this.cells.right.y >= this.BOARD_HEIGHT - this.CELL_WIDTH ||
       this.checkBorderPionks(this)
     ) {
       this.stop = true;
@@ -135,9 +138,9 @@ export class Pionek {
           if (this.checkLeftCollision()) break;
 
           this.updateBothCoordinates(
-            this.cells.left.x - 20,
+            this.cells.left.x - this.CELL_WIDTH,
             undefined,
-            this.cells.right.x - 20,
+            this.cells.right.x - this.CELL_WIDTH,
             undefined
           );
 
@@ -146,9 +149,9 @@ export class Pionek {
           // prettier-ignore
           if (this.checkRightCollision() ) break;
           this.updateBothCoordinates(
-            this.cells.left.x + 20,
+            this.cells.left.x + this.CELL_WIDTH,
             undefined,
-            this.cells.right.x + 20,
+            this.cells.right.x + this.CELL_WIDTH,
             undefined
           );
 
@@ -163,9 +166,9 @@ export class Pionek {
           }
           this.updateBothCoordinates(
             undefined,
-            this.cells.left.y + 20,
+            this.cells.left.y + this.CELL_WIDTH,
             undefined,
-            this.cells.right.y + 20
+            this.cells.right.y + this.CELL_WIDTH
           );
 
           break;
@@ -190,54 +193,54 @@ export class Pionek {
   }
 
   checkBordersOnRotation = (x: number) => {
-    if (x <= 0 || x >= 160) return false;
+    if (x <= 0 || x >= this.BOARD_WIDTH) return false;
     else return true;
   };
 
   private rotate(xSpan, ySpan, letter) {
     //refactor!
     if (letter == "r") {
-      if (xSpan == 20 && ySpan == 0) {
+      if (xSpan == this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-20)
-        this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-20)
+        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-this.CELL_WIDTH)
+        this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-this.CELL_WIDTH)
       }
-      if (xSpan == 0 && ySpan == -20) {
+      if (xSpan == 0 && ySpan == -this.CELL_WIDTH) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x-20,this.cells.left.y)
+        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x-this.CELL_WIDTH,this.cells.left.y)
         this.updateBothCoordinates(
-          this.cells.left.x + 20,
+          this.cells.left.x + this.CELL_WIDTH,
           this.cells.left.y,
           this.cells.right.x,
-          this.cells.right.y + 20
+          this.cells.right.y + this.CELL_WIDTH
         );
       }
-      if (xSpan == -20 && ySpan == 0) {
+      if (xSpan == -this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
-        this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-20,undefined,undefined)
+        this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH,undefined,undefined)
       }
-      if (xSpan == 0 && ySpan == 20) {
+      if (xSpan == 0 && ySpan == this.CELL_WIDTH) {
         //prettier-ignore
-        this.updateBothCoordinates(this.cells.left.x,this.cells.left.y+20,this.cells.left.x+20,this.cells.right.y)
+        this.updateBothCoordinates(this.cells.left.x,this.cells.left.y+this.CELL_WIDTH,this.cells.left.x+this.CELL_WIDTH,this.cells.right.y)
       }
     }
 
     if (letter == "t") {
-      if (xSpan == 20 && ySpan == 0) {
+      if (xSpan == this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
-        this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-20,undefined,undefined)
+        this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH,undefined,undefined)
       }
-      if (xSpan == 0 && ySpan == -20) {
+      if (xSpan == 0 && ySpan == -this.CELL_WIDTH) {
         //prettier-ignore
-        this.updateBothCoordinates(this.cells.left.x-20,this.cells.left.y,this.cells.right.x,this.cells.right.y+20)
+        this.updateBothCoordinates(this.cells.left.x-this.CELL_WIDTH,this.cells.left.y,this.cells.right.x,this.cells.right.y+this.CELL_WIDTH)
       }
-      if (xSpan == -20 && ySpan == 0) {
+      if (xSpan == -this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
-        this.updateBothCoordinates(this.cells.left.x,this.cells.left.y,this.cells.right.x+20,this.cells.left.y-20)
+        this.updateBothCoordinates(this.cells.left.x,this.cells.left.y,this.cells.right.x+this.CELL_WIDTH,this.cells.left.y-this.CELL_WIDTH)
       }
-      if (xSpan == 0 && ySpan == 20) {
+      if (xSpan == 0 && ySpan == this.CELL_WIDTH) {
         //prettier-ignore
-        this.updateBothCoordinates(this.cells.left.x,this.cells.right.y,this.cells.right.x-20,this.cells.right.y)
+        this.updateBothCoordinates(this.cells.left.x,this.cells.right.y,this.cells.right.x-this.CELL_WIDTH,this.cells.right.y)
       }
     }
   }
@@ -249,12 +252,12 @@ export class Pionek {
     yRight: number | undefined
   ) {
     if (
-      yLeft > 300 ||
-      yRight > 300 ||
+      yLeft > this.BOARD_HEIGHT ||
+      yRight > this.BOARD_HEIGHT ||
       xLeft < 0 ||
-      xLeft >= 160 ||
+      xLeft >= this.BOARD_WIDTH ||
       xRight < 0 ||
-      xRight >= 160
+      xRight >= this.BOARD_WIDTH
     )
       return;
     if (yLeft !== undefined) {
