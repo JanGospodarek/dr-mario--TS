@@ -66,14 +66,14 @@ export class Game implements GameInter {
       div.style.top = `${this.allCells[index].y}px`;
       div.style.backgroundColor = this.possibleColors[i];
       // div.style.backgroundColor = "black";
-      console.log(div);
+      // console.log(div);
 
       this.boardCon.append(div);
 
       this.allCells[index].flag = "virus";
       this.allCells[index].color = this.possibleColors[i];
       this.allCells[index].div = div;
-      console.log(this.allCells[index]);
+      // console.log(this.allCells[index]);
     });
   }
 
