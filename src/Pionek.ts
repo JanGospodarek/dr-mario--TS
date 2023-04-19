@@ -169,6 +169,11 @@ export class Pionek {
     });
   }
 
+  checkBordersOnRotation = (x: number) => {
+    if (x <= 0 || x >= 160) return false;
+    else return true;
+  };
+
   private rotate(xSpan, ySpan, letter) {
     //refactor!
     if (letter == "r") {
@@ -180,7 +185,6 @@ export class Pionek {
       if (xSpan == 0 && ySpan == -20) {
         //prettier-ignore
         // this.updateBothCoordinates(undefined,undefined,this.cells.left.x-20,this.cells.left.y)
-
         this.updateBothCoordinates(
           this.cells.left.x + 20,
           this.cells.left.y,
@@ -197,6 +201,7 @@ export class Pionek {
         this.updateBothCoordinates(this.cells.left.x,this.cells.left.y+20,this.cells.left.x+20,this.cells.right.y)
       }
     }
+
     if (letter == "t") {
       if (xSpan == 20 && ySpan == 0) {
         //prettier-ignore
@@ -223,6 +228,15 @@ export class Pionek {
     xRight: number | undefined,
     yRight: number | undefined
   ) {
+    if (
+      yLeft > 300 ||
+      yRight > 300 ||
+      xLeft < 0 ||
+      xLeft >= 160 ||
+      xRight < 0 ||
+      xRight >= 160
+    )
+      return;
     if (yLeft !== undefined) {
       this.cells.left.y = yLeft;
       this.cells.left.div.style.top = yLeft + "px";

@@ -246,28 +246,6 @@ export class Game implements GameInter {
     // opadanie();
   }
 
-  // checkBordersOnRotation = (
-  //   pos: { x: number; y: number },
-  //   rotation: string,
-  //   id: string
-  // ) => {
-  //   let wynik = false;
-  //   let span = 0;
-  //   rotation == "r" ? (span = -20) : (span = 20);
-
-  //   this.pionks.forEach((element) => {
-  //     if (id == element.id) return;
-  //     if (
-  //       (pos.x == element.cells.left.x + span ||
-  //         pos.x == element.cells.right.x + span) &&
-  //       (pos.y == element.cells.left.y || pos.y == element.cells.right.y)
-  //     ) {
-  //       wynik = true;
-  //     }
-  //   });
-
-  //   return wynik;
-  // };
   private reRender() {
     this.allCells.forEach((cell) => {
       if (cell.div == null) return;
