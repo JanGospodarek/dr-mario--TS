@@ -1,11 +1,14 @@
 import { Cell, GameInter, cellObj } from "../types/interfaces";
 import { Pionek } from "./Pionek";
 import genUniqueId from "./utils/genUniqueId";
-
+import { frame } from "../types/interfaces";
 export class Game implements GameInter {
   boardCon = <HTMLDivElement>document.getElementById("board");
   scoreCon = <HTMLDivElement>document.getElementById("score");
   bestScoreCon = <HTMLDivElement>document.getElementById("bestScore");
+  boardGraphicCoords: frame;
+  img: any;
+  destId = "";
   pionks: Pionek[] = [];
   allCells: Cell[] = [];
   score = 0;
@@ -16,6 +19,24 @@ export class Game implements GameInter {
   constructor() {
     this.bestScore = +localStorage.getItem("best");
 
+    fetch("./data/animations.json")
+      .then((res) => res.json())
+      .then((data) => {
+        // let imgsArray = []; // tablica z animacjami
+        // let anim = function () {
+        //     for (let i = 0; i < imgsArray.length; i++) imgsArray[i].goAnim()
+        //     window.requestAnimationFrame(anim); // z definicji 60 klatek/s
+        // }
+
+        this.img = new Image();
+        this.img.src = "./img/spritesheet.png";
+        this.img.onload = () => {
+          this.boardGraphicCoords = data.board.pos;
+          // imgsArray.push(new Anim(this, data.blue, "blue"));
+          // imgsArray.push(new Anim(this, data.yellow, "yellow"))
+          // anim();
+        };
+      });
     this.renderBoard();
     this.renderPionek();
     this.renderViruses();
@@ -41,6 +62,25 @@ export class Game implements GameInter {
         this.boardCon.append(div);
       }
     }
+    //drawing graphics
+    let canvas = document.createElement("canvas");
+    canvas.width = 96;
+    canvas.height = 72;
+    let ctx = canvas.getContext("2d");
+    ctx.drawImage(
+      this.img,
+      this.boardGraphicCoords.x0,
+      this.boardGraphicCoords.y0,
+      this.boardGraphicCoords.w,
+      this.boardGraphicCoords.h,
+      0,
+      0,
+      this.boardGraphicCoords.w,
+      this.boardGraphicCoords.h
+    );
+    let url = canvas.toDataURL();
+    let dest = document.getElementById(this.destId);
+    dest.style.backgroundImage = "url('" + url + "')";
   }
 
   private renderPionek() {

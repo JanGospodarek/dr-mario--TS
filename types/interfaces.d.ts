@@ -34,3 +34,9 @@ export interface GameInter {
   score: number;
   cellsToDelete: Cell[];
 }
+export interface frame {
+  x0: number;
+  y0: number;
+  w: number;
+  h: number;
+}
