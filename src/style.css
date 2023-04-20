@@ -41,17 +41,116 @@ body {
   width: 96px;
   height: 72px;
   position: absolute;
+  top: 51%;
+  left: 51%;
+  margin: -45px;
+  /* transform: translateX(-48px);
+  transform: translateY(-36px); */
   transform: scale(0.7);
 }
-#yellow {
-  top: 210px;
-  left: 75px;
+.virus-wrapper {
+  width: 170px;
+  height: 170px;
+  /* background-color: aliceblue; */
+  position: absolute;
+  top: 205px;
+  left: 37px;
+}
+/* start */
+
+div#yellow.first-step {
+  transform: translateY(25px) translateX(-48px) scale(0.7);
+}
+div#blue.first-step {
+  transform: translateY(-36px) scale(0.7) translateX(0);
+}
+div#red.first-step {
+  transform: translateY(25px) translateX(40px) scale(0.7);
+}
+/* second */
+
+div#yellow.second-step {
+  transform: translateY(50px) translateX(-20px) scale(0.7);
+}
+div#blue.second-step {
+  transform: translateY(-30px) scale(0.7) translateX(-40px);
+}
+div#red.second-step {
+  transform: translateY(5px) translateX(50px) scale(0.7);
+}
+/* third */
+
+div#yellow.third-step {
+  transform: translateY(40px) translateX(25px) scale(0.7);
+}
+div#blue.third-step {
+  transform: translateY(0px) scale(0.7) translateX(-70px);
+}
+div#red.third-step {
+  transform: translateY(-25px) translateX(30px) scale(0.7);
+}
+
+/* fourth */
+
+div#yellow.fourth-step {
+  transform: translateY(10px) translateX(40px) scale(0.7);
+}
+div#blue.fourth-step {
+  transform: translateY(30px) scale(0.7) translateX(-60px);
+}
+div#red.fourth-step {
+  transform: translateY(-40px) translateX(-15px) scale(0.7);
+}
+/* fourth */
+
+div#yellow.fifth-step {
+  transform: translateY(-30px) translateX(20px) scale(0.7);
+}
+div#blue.fifth-step {
+  transform: translateY(45px) scale(0.7) translateX(25px);
+}
+div#red.fifth-step {
+  transform: translateY(5px) translateX(-50px) scale(0.7);
+}
+/* fivth */
+
+div#yellow.sixth-step {
+  transform: translateY(-30px) translateX(-30px) scale(0.7);
+}
+div#blue.sixth-step {
+  transform: translateY(10px) scale(0.7) translateX(55px);
+}
+div#red.sixth-step {
+  transform: translateY(35px) translateX(-40px) scale(0.7);
+}
+
+/* second */
+/* div#yellow {
+  transform: translateY(40px) translateX(-35px) scale(0.7);
 }
 #blue {
-  top: 275px;
-  left: 110px;
+  transform: translateY(-30px) scale(0.7) translateX(-50px);
 }
 #red {
-  top: 275px;
-  left: 35px;
+  transform: translateY(10px) translateX(44px) scale(0.7);
+} */
+/* third */
+/* #yellow {
+  transform: translateY(50px) translateX(-10px) scale(0.7);
 }
+#blue {
+  transform: translateY(-10px) scale(0.7) translateX(-70px);
+}
+#red {
+  transform: translateY(-10px) translateX(44px) scale(0.7);
+} */
+/* fourth */
+/* #yellow {
+  transform: translateY(50px) translateX(-10px) scale(0.7);
+}
+#blue {
+  transform: translateY(-10px) scale(0.7) translateX(-70px);
+}
+#red {
+  transform: translateY(-10px) translateX(44px) scale(0.7);
+} */

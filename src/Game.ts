@@ -13,6 +13,19 @@ export class Game implements GameInter {
   destId = "board-img-cont";
   pionks: Pionek[] = [];
   allCells: Cell[] = [];
+  viruses = {
+    red: <HTMLDivElement>document.getElementById("red"),
+    blue: <HTMLDivElement>document.getElementById("blue"),
+    yellow: <HTMLDivElement>document.getElementById("yellow"),
+  };
+  steps = [
+    "first-step",
+    "second-step",
+    "third-step",
+    "fourth-step",
+    "fifth-step",
+    "sixth-step",
+  ];
   score = 0;
   bestScore = 0;
   private possibleColors = ["#BB8FCE", "#85C1E9", "#F7DC6F", "#F1948A"];
@@ -42,8 +55,28 @@ export class Game implements GameInter {
           this.renderPionek();
           this.renderViruses();
           this.renderScore();
+          this.animateViruses();
         };
       });
+  }
+  private animateViruses() {
+    let iterator = 1;
+    let i = setInterval(() => {
+      if (iterator == 7) iterator = 1;
+      for (const key in this.viruses) {
+        const virus = <HTMLDivElement>this.viruses[key];
+
+        let newClass = this.steps[iterator];
+        let oldClass = this.steps[iterator - 1];
+
+        if (this.steps[iterator - 1] == "sixth-step") {
+          newClass = this.steps[0];
+        }
+
+        virus.classList.replace(oldClass, newClass);
+      }
+      iterator++;
+    }, 3000);
   }
 
   private renderBoard() {
