@@ -76,7 +76,7 @@ export class Game implements GameInter {
         virus.classList.replace(oldClass, newClass);
       }
       iterator++;
-    }, 3000);
+    }, 2000);
   }
 
   private renderBoard() {
