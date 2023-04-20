@@ -56,6 +56,22 @@ body {
   top: 205px;
   left: 37px;
 }
+
+.score-cont {
+  width: 120px;
+  height: 25px;
+  position: absolute;
+  background-color: aliceblue;
+  border: 1px solid black;
+}
+#top-cont {
+  left: 80px;
+  top: 73px;
+}
+#cur-cont {
+  left: 80px;
+  top: 128px;
+}
 /* start */
 
 div#yellow.first-step {

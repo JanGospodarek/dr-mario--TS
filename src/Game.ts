@@ -6,9 +6,11 @@ import { Anim } from "./Anim";
 export class Game implements GameInter {
   boardCon = <HTMLDivElement>document.getElementById("board");
   scoreCon = <HTMLDivElement>document.getElementById("score");
+  curScoreCon = <HTMLDivElement>document.getElementById("cur-cont");
   bestScoreCon = <HTMLDivElement>document.getElementById("bestScore");
   boardGraphicCoords: frame;
   CELL_WIDTH = 17;
+  data: any;
   img: any;
   destId = "board-img-cont";
   pionks: Pionek[] = [];
@@ -42,7 +44,7 @@ export class Game implements GameInter {
           for (let i = 0; i < imgsArray.length; i++) imgsArray[i].goAnim();
           window.requestAnimationFrame(anim); // z definicji 60 klatek/s
         };
-
+        this.data = data;
         this.img = new Image();
         this.img.src = "./img/spritesheet.png";
         this.img.onload = () => {
@@ -58,25 +60,6 @@ export class Game implements GameInter {
           this.animateViruses();
         };
       });
-  }
-  private animateViruses() {
-    let iterator = 1;
-    let i = setInterval(() => {
-      if (iterator == 7) iterator = 1;
-      for (const key in this.viruses) {
-        const virus = <HTMLDivElement>this.viruses[key];
-
-        let newClass = this.steps[iterator];
-        let oldClass = this.steps[iterator - 1];
-
-        if (this.steps[iterator - 1] == "sixth-step") {
-          newClass = this.steps[0];
-        }
-
-        virus.classList.replace(oldClass, newClass);
-      }
-      iterator++;
-    }, 2000);
   }
 
   private renderBoard() {
@@ -120,39 +103,7 @@ export class Game implements GameInter {
     let dest = document.getElementById(this.destId);
     dest.style.backgroundImage = "url('" + url + "')";
   }
-  private getBackgroundUrlVirus(data, color) {
-    let canvas = document.createElement("canvas");
-    canvas.width = 15;
-    canvas.height = 15;
-    let ctx = canvas.getContext("2d");
-    console.log(color == "#FF0000");
-    console.log(data.red);
 
-    //prettier-ignore
-
-    switch (color) {
-      case "#FF0000":      
-      console.log(data.virusRed);
-      
-        ctx.drawImage( this.img,data.virusRed.pos.x0,data.virusRed.pos.y0, data.virusRed.pos.w,data.virusRed.pos.h,0,0,data.virusRed.pos.w,data.virusRed.pos.h);
-
-        break;
-        case '#0000FF':
-          ctx.drawImage( this.img,data.virusBlue.pos.x0,data.virusBlue.pos.y0, data.virusBlue.pos.w,data.virusBlue.pos.h,0,0,data.virusBlue.pos.w,data.virusBlue.pos.h);
-  
-          break; 
-        case '#FFFF00':
-          ctx.drawImage( this.img,data.virusYellow.pos.x0,data.virusYellow.pos.y0, data.virusYellow.pos.w,data.virusYellow.pos.h,0,0,data.virusYellow.pos.w,data.virusYellow.pos.h);
-  
-          break;
-     
-    }
-
-    let url = canvas.toDataURL();
-    return url;
-    // let dest = document.getElementById(this.destId);
-    // dest.style.backgroundImage = "url('" + url + "')";
-  }
   private renderPionek() {
     const pionek = new Pionek(
       this.boardCon,
@@ -162,13 +113,7 @@ export class Game implements GameInter {
     );
     this.pionks.push(pionek);
   }
-  private checkCollisionsOnMove = (x, y) => {
-    const index = this.allCells.findIndex(
-      (el) => el.x == x && el.y == y && el.div !== null
-    );
-    if (index == -1) return false;
-    else return true;
-  };
+
   private renderViruses(data) {
     const indexes = [];
     while (indexes.length < 3) {
@@ -196,6 +141,66 @@ export class Game implements GameInter {
     });
   }
 
+  private animateViruses() {
+    let iterator = 1;
+    let i = setInterval(() => {
+      if (iterator == 7) iterator = 1;
+      for (const key in this.viruses) {
+        const virus = <HTMLDivElement>this.viruses[key];
+
+        let newClass = this.steps[iterator];
+        let oldClass = this.steps[iterator - 1];
+
+        if (this.steps[iterator - 1] == "sixth-step") {
+          newClass = this.steps[0];
+        }
+
+        virus.classList.replace(oldClass, newClass);
+      }
+      iterator++;
+    }, 2000);
+  }
+
+  private getBackgroundUrlVirus(data, color) {
+    let canvas = document.createElement("canvas");
+    canvas.width = 15;
+    canvas.height = 15;
+    let ctx = canvas.getContext("2d");
+
+    //prettier-ignore
+
+    switch (color) {
+      case "#FF0000":      
+      console.log(data.virusRed);
+      
+        ctx.drawImage( this.img,data.virusRed.pos.x0,data.virusRed.pos.y0, data.virusRed.pos.w,data.virusRed.pos.h,0,0,data.virusRed.pos.w,data.virusRed.pos.h);
+
+        break;
+        case '#0000FF':
+          ctx.drawImage( this.img,data.virusBlue.pos.x0,data.virusBlue.pos.y0, data.virusBlue.pos.w,data.virusBlue.pos.h,0,0,data.virusBlue.pos.w,data.virusBlue.pos.h);
+  
+          break; 
+        case '#FFFF00':
+          ctx.drawImage( this.img,data.virusYellow.pos.x0,data.virusYellow.pos.y0, data.virusYellow.pos.w,data.virusYellow.pos.h,0,0,data.virusYellow.pos.w,data.virusYellow.pos.h);
+  
+          break;
+     
+    }
+
+    let url = canvas.toDataURL();
+    return url;
+    // let dest = document.getElementById(this.destId);
+    // dest.style.backgroundImage = "url('" + url + "')";
+  }
+
+  private checkCollisionsOnMove = (x, y) => {
+    const index = this.allCells.findIndex(
+      (el) => el.x == x && el.y == y && el.div !== null
+    );
+    if (index == -1) return false;
+    else return true;
+  };
+
   public renew = (pionek) => {
     for (const key in pionek.cells) {
       const c = pionek.cells[key];
@@ -213,21 +218,10 @@ export class Game implements GameInter {
 
   public checkBorderPionks = (pionek: Pionek) => {
     let wynik = false;
+
     this.allCells.forEach((element) => {
       for (const key in pionek.cells) {
         const pos = pionek.cells[key];
-
-        // if (pionek.id == element.id) return;
-        // if (
-        //   (pos.x == element.cells.left.x || pos.x == element.cells.right.x) &&
-        //   (pos.y == element.cells.left.y - 20 ||
-        //     pos.y == element.cells.right.y - 20)
-        // ) {
-        //   wynik = true;
-        // }
-        // console.log(pos.div == element.div);
-
-        // if (pos.div == element.div) return;
         if (
           pos.x == element.x &&
           pos.y + this.CELL_WIDTH == element.y &&
@@ -245,6 +239,7 @@ export class Game implements GameInter {
     const checkInRow = (element: Cell, vectorX: number, vectorY: number) => {
       this.cellsToDelete = [element];
       let bool = true;
+
       for (let index = 1; index < 4; index++) {
         const l = this.allCells.findIndex(
           (el) =>
@@ -256,6 +251,7 @@ export class Game implements GameInter {
           bool = false;
           break;
         }
+
         if (this.allCells[l].div == null) {
           bool = false;
           break;
@@ -265,6 +261,7 @@ export class Game implements GameInter {
           bool = false;
           break;
         }
+
         this.cellsToDelete.push(this.allCells[l]);
       }
       return bool;
@@ -319,6 +316,7 @@ export class Game implements GameInter {
       });
     }
   }
+
   private checkIfVirusWasKilled() {
     const indexOfVirus = this.cellsToDelete.findIndex(
       (el) => el.flag == "virus"
@@ -326,7 +324,9 @@ export class Game implements GameInter {
     if (indexOfVirus !== -1) {
       this.score += 100;
       if (this.score > this.bestScore) this.bestScore = this.score;
+
       localStorage.setItem("best", String(this.score));
+
       this.renderScore();
     }
   }
@@ -365,14 +365,39 @@ export class Game implements GameInter {
     // opadanie();
   }
 
-  private reRender() {
-    this.allCells.forEach((cell) => {
-      if (cell.div == null) return;
-      cell.div.style.top = cell.x + "px";
-    });
-  }
+  // private reRender() {
+  //   this.allCells.forEach((cell) => {
+  //     if (cell.div == null) return;
+  //     cell.div.style.top = cell.x + "px";
+  //   });
+  // }
   private renderScore() {
-    this.scoreCon.innerText = String(this.score).padStart(8, "0");
+    const curStr = String(this.score).padStart(8, "0");
+    this.scoreCon.innerText = curStr;
     this.bestScoreCon.innerText = String(this.bestScore).padStart(8, "0");
+    curStr.split("").forEach((letter, i) => {
+      const pos = this.data.numbers.pos[Number(letter)];
+
+      let canvas = document.createElement("canvas");
+      canvas.width = 192;
+      canvas.height = 23;
+      let ctx = canvas.getContext("2d");
+      console.log(pos);
+
+      ctx.drawImage(
+        this.img,
+        pos.x0,
+        pos.y0,
+        pos.w,
+        pos.h,
+        i * 24,
+        0,
+        pos.w,
+        pos.h
+      );
+
+      let url = canvas.toDataURL();
+      this.curScoreCon.style.backgroundImage = "url('" + url + "')";
+    });
   }
 }
