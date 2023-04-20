@@ -37,3 +37,21 @@ body {
 .stopped-cell {
   position: absolute;
 }
+.virus-cont {
+  width: 96px;
+  height: 72px;
+  position: absolute;
+  transform: scale(0.7);
+}
+#yellow {
+  top: 210px;
+  left: 75px;
+}
+#blue {
+  top: 275px;
+  left: 110px;
+}
+#red {
+  top: 275px;
+  left: 35px;
+}

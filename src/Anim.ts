@@ -1,6 +1,6 @@
 import { frame } from "../types/interfaces";
 
-class Anime {
+export class Anim {
   tickNumber = 0; // aktualny tick (u mnie 60/s)
   actFrame = 0; // aktualnie renderowana klatka
   frames: frame[];
@@ -10,6 +10,7 @@ class Anime {
     // spritesheet
 
     // id elementu w DOM'ie do wyświetlania klatek (u mnie przez css background-image)
+    console.log(ob);
 
     ///// dane z json'a //////
     this.frames = ob.frames; // tablica z klatkami

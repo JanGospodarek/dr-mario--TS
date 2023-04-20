@@ -2,6 +2,7 @@ import { Cell, GameInter, cellObj } from "../types/interfaces";
 import { Pionek } from "./Pionek";
 import genUniqueId from "./utils/genUniqueId";
 import { frame } from "../types/interfaces";
+import { Anim } from "./Anim";
 export class Game implements GameInter {
   boardCon = <HTMLDivElement>document.getElementById("board");
   scoreCon = <HTMLDivElement>document.getElementById("score");
@@ -23,19 +24,20 @@ export class Game implements GameInter {
     fetch("./data/animations.json")
       .then((res) => res.json())
       .then((data) => {
-        // let imgsArray = []; // tablica z animacjami
-        // let anim = function () {
-        //     for (let i = 0; i < imgsArray.length; i++) imgsArray[i].goAnim()
-        //     window.requestAnimationFrame(anim); // z definicji 60 klatek/s
-        // }
+        let imgsArray: Anim[] = []; // tablica z animacjami
+        let anim = function () {
+          for (let i = 0; i < imgsArray.length; i++) imgsArray[i].goAnim();
+          window.requestAnimationFrame(anim); // z definicji 60 klatek/s
+        };
 
         this.img = new Image();
         this.img.src = "./img/spritesheet.png";
         this.img.onload = () => {
           this.boardGraphicCoords = data.board.pos;
-          // imgsArray.push(new Anim(this, data.blue, "blue"));
-          // imgsArray.push(new Anim(this, data.yellow, "yellow"))
-          // anim();
+          imgsArray.push(new Anim(this.img, data.blue, "blue"));
+          imgsArray.push(new Anim(this.img, data.yellow, "yellow"));
+          imgsArray.push(new Anim(this.img, data.red, "red"));
+          anim();
           this.renderBoard();
           this.renderPionek();
           this.renderViruses();
