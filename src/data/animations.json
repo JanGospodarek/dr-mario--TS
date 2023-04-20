@@ -59,36 +59,17 @@
     "type": "no-animate",
     "pos": { "x0": 3022, "y0": 0, "w": 332, "h": 118 }
   },
-  "virusAnimsPositions": [
-    {
-      "yellow": { "x": 25, "y": -48 },
-      "blue": { "x": -36, "y": 0 },
-      "yellow": { "x": 25, "y": 40 }
-    },
-    {
-      "yellow": { "x": 25, "y": -48 },
-      "blue": { "x": -36, "y": 0 },
-      "yellow": { "x": 25, "y": 40 }
-    },
-    {
-      "yellow": { "x": 25, "y": -48 },
-      "blue": { "x": -36, "y": 0 },
-      "yellow": { "x": 25, "y": 40 }
-    },
-    {
-      "yellow": { "x": 25, "y": -48 },
-      "blue": { "x": -36, "y": 0 },
-      "yellow": { "x": 25, "y": 40 }
-    },
-    {
-      "yellow": { "x": 25, "y": -48 },
-      "blue": { "x": -36, "y": 0 },
-      "yellow": { "x": 25, "y": 40 }
-    },
-    {
-      "yellow": { "x": 25, "y": -48 },
-      "blue": { "x": -36, "y": 0 },
-      "yellow": { "x": 25, "y": 40 }
-    }
-  ]
+
+  "virusBlue": {
+    "type": "no-animate",
+    "pos": { "x0": 1832, "y0": 0, "w": 15, "h": 15 }
+  },
+  "virusRed": {
+    "type": "no-animate",
+    "pos": { "x0": 1848, "y0": 0, "w": 15, "h": 15 }
+  },
+  "virusYellow": {
+    "type": "no-animate",
+    "pos": { "x0": 1864, "y0": 0, "w": 15, "h": 15 }
+  }
 }

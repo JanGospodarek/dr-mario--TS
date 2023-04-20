@@ -10,7 +10,6 @@ export class Anim {
     // spritesheet
 
     // id elementu w DOM'ie do wyświetlania klatek (u mnie przez css background-image)
-    console.log(ob);
 
     ///// dane z json'a //////
     this.frames = ob.frames; // tablica z klatkami

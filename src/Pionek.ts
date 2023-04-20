@@ -10,7 +10,7 @@ export class Pionek {
   BOARD_HEIGHT = 255;
   private stop = false;
   private manualMovingDown = false;
-  private possibleColors = ["#BB8FCE", "#85C1E9", "#F7DC6F", "#F1948A"];
+  private possibleColors = ["#FF0000", "#FFFF00", "#0000FF"];
   cells: Cells = {
     left: { x: 51, y: 0, div: null, color: "none", flag: "normal" },
     right: { x: 68, y: 0, div: null, color: "none", flag: "normal" },
@@ -64,7 +64,7 @@ export class Pionek {
   //   return i;
   // }
   private getColor() {
-    return Math.floor(Math.random() * 4);
+    return Math.floor(Math.random() * 3);
   }
   private moving() {
     this.movingInterval = setInterval(() => {
@@ -144,6 +144,13 @@ export class Pionek {
             undefined
           );
 
+          if (this.checkBottomCollision()) {
+            clearInterval(this.movingInterval);
+            this.stop = true;
+            this.renewGame(this);
+            return;
+          }
+
           break;
         case "ArrowRight":
           // prettier-ignore
@@ -155,6 +162,12 @@ export class Pionek {
             undefined
           );
 
+          if (this.checkBottomCollision()) {
+            clearInterval(this.movingInterval);
+            this.stop = true;
+            this.renewGame(this);
+            return;
+          }
           break;
         case "ArrowDown":
           // prettier-ignore

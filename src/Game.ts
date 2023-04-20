@@ -28,7 +28,7 @@ export class Game implements GameInter {
   ];
   score = 0;
   bestScore = 0;
-  private possibleColors = ["#BB8FCE", "#85C1E9", "#F7DC6F", "#F1948A"];
+  private possibleColors = ["#FF0000", "#FFFF00", "#0000FF"];
   cellsToDelete: Cell[] = [];
   gameId = genUniqueId();
   constructor() {
@@ -53,7 +53,7 @@ export class Game implements GameInter {
           anim();
           this.renderBoard();
           this.renderPionek();
-          this.renderViruses();
+          this.renderViruses(data);
           this.renderScore();
           this.animateViruses();
         };
@@ -103,11 +103,6 @@ export class Game implements GameInter {
     canvas.width = this.boardGraphicCoords.w;
     canvas.height = this.boardGraphicCoords.h;
     let ctx = canvas.getContext("2d");
-    console.log(
-      this.boardGraphicCoords.x0,
-      this.boardGraphicCoords.y0,
-      this.boardGraphicCoords.w
-    );
 
     ctx.drawImage(
       this.img,
@@ -125,7 +120,39 @@ export class Game implements GameInter {
     let dest = document.getElementById(this.destId);
     dest.style.backgroundImage = "url('" + url + "')";
   }
+  private getBackgroundUrlVirus(data, color) {
+    let canvas = document.createElement("canvas");
+    canvas.width = 15;
+    canvas.height = 15;
+    let ctx = canvas.getContext("2d");
+    console.log(color == "#FF0000");
+    console.log(data.red);
 
+    //prettier-ignore
+
+    switch (color) {
+      case "#FF0000":      
+      console.log(data.virusRed);
+      
+        ctx.drawImage( this.img,data.virusRed.pos.x0,data.virusRed.pos.y0, data.virusRed.pos.w,data.virusRed.pos.h,0,0,data.virusRed.pos.w,data.virusRed.pos.h);
+
+        break;
+        case '#0000FF':
+          ctx.drawImage( this.img,data.virusBlue.pos.x0,data.virusBlue.pos.y0, data.virusBlue.pos.w,data.virusBlue.pos.h,0,0,data.virusBlue.pos.w,data.virusBlue.pos.h);
+  
+          break; 
+        case '#FFFF00':
+          ctx.drawImage( this.img,data.virusYellow.pos.x0,data.virusYellow.pos.y0, data.virusYellow.pos.w,data.virusYellow.pos.h,0,0,data.virusYellow.pos.w,data.virusYellow.pos.h);
+  
+          break;
+     
+    }
+
+    let url = canvas.toDataURL();
+    return url;
+    // let dest = document.getElementById(this.destId);
+    // dest.style.backgroundImage = "url('" + url + "')";
+  }
   private renderPionek() {
     const pionek = new Pionek(
       this.boardCon,
@@ -142,9 +169,9 @@ export class Game implements GameInter {
     if (index == -1) return false;
     else return true;
   };
-  private renderViruses() {
+  private renderViruses(data) {
     const indexes = [];
-    while (indexes.length < 4) {
+    while (indexes.length < 3) {
       const index = 40 + Math.floor(Math.random() * 60);
       if (indexes.indexOf(index) === -1) indexes.push(index);
     }
@@ -154,9 +181,11 @@ export class Game implements GameInter {
       div.classList.add("cell");
       div.style.left = `${this.allCells[index].x}px`;
       div.style.top = `${this.allCells[index].y}px`;
-      div.style.backgroundColor = this.possibleColors[i];
-      // div.style.backgroundColor = "black";
-      // console.log(div);
+
+      // div.style.backgroundColor = this.possibleColors[i];
+      const url = this.getBackgroundUrlVirus(data, this.possibleColors[i]);
+
+      div.style.backgroundImage = "url('" + url + "')";
 
       this.boardCon.append(div);
 
