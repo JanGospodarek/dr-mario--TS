@@ -259,6 +259,10 @@ export class Game implements GameInter {
           pos.y + this.CELL_WIDTH == element.y &&
           element.div !== null
         ) {
+          if (pos.y <= 17) {
+            this.stop = true;
+            this.renderAlert("gameOver");
+          }
           wynik = true;
         }
       }
@@ -509,7 +513,6 @@ export class Game implements GameInter {
     ctx.drawImage(this.img, pos.x0, pos.y0, pos.w, pos.h, 0, 0, pos.w, pos.h);
 
     let url = canvas.toDataURL();
-    this.alertCon.style.backgroundImage = "url('" + url + "')";
     if (msg == "gameOver") {
       this.alertLooseCon.style.backgroundImage = "url('" + url + "')";
     } else {
