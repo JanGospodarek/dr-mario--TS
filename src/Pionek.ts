@@ -3,18 +3,23 @@ import genUniqueId from "./utils/genUniqueId";
 
 export class Pionek {
   private btn = <HTMLDivElement>document.getElementById("stop");
-  id = genUniqueId();
-  private movingInterval: any;
-  CELL_WIDTH = 17;
-  BOARD_WIDTH = 135;
-  BOARD_HEIGHT = 255;
-  private stop = false;
-  private manualMovingDown = false;
-  private possibleColors = ["#FF0000", "#FFFF00", "#0000FF"];
+
   cells: Cells = {
     left: { x: 51, y: 0, div: null, color: "none", flag: "normal" },
     right: { x: 68, y: 0, div: null, color: "none", flag: "normal" },
   };
+  private possibleColors = ["#FF0000", "#FFFF00", "#0000FF"];
+
+  id = genUniqueId();
+
+  CELL_WIDTH = 17;
+  BOARD_WIDTH = 135;
+  BOARD_HEIGHT = 255;
+
+  private stop = false;
+  private manualMovingDown = false;
+
+  private movingInterval: any;
 
   constructor(
     private boardDiv: HTMLDivElement,
@@ -37,12 +42,12 @@ export class Pionek {
     for (let index = 0; index < 2; index++) {
       const cell = document.createElement("div");
 
-      // const colorIndex = this.getColor(fristColor);
-      // fristColor = colorIndex;
       const colorIndex = this.getColor();
+
       cell.style.backgroundColor = this.possibleColors[colorIndex];
       cell.innerText = String(index);
       cell.classList.add("pionek-cell");
+
       this.boardDiv.append(cell);
 
       let key = "";
@@ -56,27 +61,16 @@ export class Pionek {
     }
   }
 
-  // private getColor(except: number | null) {
-  //   let i = Math.floor(Math.random() * 5);
-  //   while (i == except) {
-  //     i = Math.floor(Math.random() * 5);
-  //   }
-  //   return i;
-  // }
   private getColor() {
     return Math.floor(Math.random() * 3);
   }
+
   private moving() {
     this.movingInterval = setInterval(() => {
       if (this.manualMovingDown) return;
-      if (!this.stop) {
-        this.updateBothCoordinates(
-          undefined,
-          this.cells.left.y + this.CELL_WIDTH,
-          undefined,
-          this.cells.right.y + this.CELL_WIDTH
-        );
-      }
+      //prettier-ignore
+      if (!this.stop) 
+        this.updateBothCoordinates(undefined,this.cells.left.y + this.CELL_WIDTH,undefined,this.cells.right.y + this.CELL_WIDTH);
 
       if (this.checkBottomCollision()) {
         clearInterval(this.movingInterval);
