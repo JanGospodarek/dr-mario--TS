@@ -58,19 +58,21 @@ body {
 }
 
 .score-cont {
-  width: 120px;
+  width: 192px;
   height: 25px;
   position: absolute;
-  background-color: aliceblue;
+  background-color: black;
   border: 1px solid black;
+  transform: scale(0.7);
+  background-repeat: no-repeat;
 }
 #top-cont {
-  left: 80px;
+  left: 40px;
   top: 73px;
 }
 #cur-cont {
-  left: 80px;
-  top: 128px;
+  left: 40px;
+  top: 123px;
 }
 /* start */
 

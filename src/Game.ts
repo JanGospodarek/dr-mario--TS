@@ -7,7 +7,8 @@ export class Game implements GameInter {
   boardCon = <HTMLDivElement>document.getElementById("board");
   scoreCon = <HTMLDivElement>document.getElementById("score");
   curScoreCon = <HTMLDivElement>document.getElementById("cur-cont");
-  bestScoreCon = <HTMLDivElement>document.getElementById("bestScore");
+  bestScoreCon = <HTMLDivElement>document.getElementById("top-cont");
+  // bestScoreCon = <HTMLDivElement>document.getElementById("bestScore");
   boardGraphicCoords: frame;
   CELL_WIDTH = 17;
   data: any;
@@ -56,6 +57,7 @@ export class Game implements GameInter {
           this.renderBoard();
           this.renderPionek();
           this.renderViruses(data);
+          this.renderScore();
           this.renderScore();
           this.animateViruses();
         };
@@ -372,18 +374,23 @@ export class Game implements GameInter {
   //   });
   // }
   private renderScore() {
+    if (this.score > this.bestScore) {
+      this.bestScore = this.score;
+    }
+
     const curStr = String(this.score).padStart(8, "0");
-    this.scoreCon.innerText = curStr;
-    this.bestScoreCon.innerText = String(this.bestScore).padStart(8, "0");
-    curStr.split("").forEach((letter, i) => {
+    const bestStr = String(this.bestScore).padStart(8, "0");
+    this.renderScoreHelper(curStr, this.curScoreCon);
+    this.renderScoreHelper(bestStr, this.bestScoreCon);
+  }
+  renderScoreHelper(str: string, place: HTMLDivElement) {
+    let canvas = document.createElement("canvas");
+    canvas.width = 300;
+    canvas.height = 23;
+    let ctx = canvas.getContext("2d");
+
+    str.split("").forEach((letter, i) => {
       const pos = this.data.numbers.pos[Number(letter)];
-
-      let canvas = document.createElement("canvas");
-      canvas.width = 192;
-      canvas.height = 23;
-      let ctx = canvas.getContext("2d");
-      console.log(pos);
-
       ctx.drawImage(
         this.img,
         pos.x0,
@@ -395,9 +402,8 @@ export class Game implements GameInter {
         pos.w,
         pos.h
       );
-
-      let url = canvas.toDataURL();
-      this.curScoreCon.style.backgroundImage = "url('" + url + "')";
     });
+    let url = canvas.toDataURL();
+    place.style.backgroundImage = "url('" + url + "')";
   }
 }
