@@ -40,8 +40,8 @@ export class Pionek {
     private checkBorderPionks: Function,
     private renewGame: Function,
     private checkCollisionsOnMove: Function,
-
-    private getBackgroundUrl
+    private getBackgroundUrl: Function,
+    private checkBordersOnRotation: Function
   ) {
     this.buildPionek();
     this.moving();
@@ -216,11 +216,6 @@ export class Pionek {
       if (e.key == "ArrowDown") this.manualMovingDown = false;
     });
   }
-
-  checkBordersOnRotation = (x: number) => {
-    if (x <= 0 || x >= this.BOARD_WIDTH) return false;
-    else return true;
-  };
 
   private rotate(xSpan, ySpan, letter) {
     //refactor!

@@ -9,8 +9,9 @@ How to run app?
 
 To do:
 
-1. Single pill skin
+1. Single pill skin -- done
 2. throwing pill animation
 3. stage completed and fail alert
 4. falling down of elements
-5. destroying animation
+5. destroying animation -- done
+6. rotation borders

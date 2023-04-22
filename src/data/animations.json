@@ -33,11 +33,9 @@
     "repeat": true
   },
   "board": {
-    "type": "no-animate",
     "pos": { "x0": 2380, "y0": 0, "w": 642, "h": 383 }
   },
   "numbers": {
-    "type": "no-animate",
     "pos": [
       { "x0": 1152, "y0": 0, "w": 24, "h": 23 },
       { "x0": 1176, "y0": 0, "w": 24, "h": 23 },
@@ -51,25 +49,20 @@
       { "x0": 1368, "y0": 0, "w": 24, "h": 23 }
     ]
   },
-  "game-over": {
-    "type": "no-animate",
+  "gameOver": {
     "pos": { "x0": 2048, "y0": 0, "w": 332, "h": 118 }
   },
-  "game-over": {
-    "type": "no-animate",
-    "pos": { "x0": 3022, "y0": 0, "w": 332, "h": 118 }
+  "stageCompleted": {
+    "pos": { "x0": 3022, "y0": 0, "w": 422, "h": 118 }
   },
 
   "virusBlue": {
-    "type": "no-animate",
     "pos": { "x0": 1832, "y0": 0, "w": 15, "h": 15 }
   },
   "virusRed": {
-    "type": "no-animate",
     "pos": { "x0": 1848, "y0": 0, "w": 15, "h": 15 }
   },
   "virusYellow": {
-    "type": "no-animate",
     "pos": { "x0": 1864, "y0": 0, "w": 15, "h": 15 }
   },
   "cellBlue": {

@@ -7,6 +7,8 @@ export class Game implements GameInter {
   boardCon = <HTMLDivElement>document.getElementById("board");
   curScoreCon = <HTMLDivElement>document.getElementById("cur-cont");
   bestScoreCon = <HTMLDivElement>document.getElementById("top-cont");
+  alertCon = <HTMLDivElement>document.getElementById("alert");
+  alertLooseCon = <HTMLDivElement>document.getElementById("alertLoose");
   viruses = {
     red: <HTMLDivElement>document.getElementById("red"),
     blue: <HTMLDivElement>document.getElementById("blue"),
@@ -18,7 +20,7 @@ export class Game implements GameInter {
   bestScore = 0;
   destId = "board-img-cont";
   gameId = genUniqueId();
-
+  stop = false;
   pionks: Pionek[] = [];
   allCells: Cell[] = [];
   cellsToDelete: Cell[] = [];
@@ -105,8 +107,10 @@ export class Game implements GameInter {
   }
 
   private renderPionek() {
+    if (this.stop) return;
+
     //prettier-ignore
-    const pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrlPill);
+    const pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrlPill,this.checkBordersOnRotation);
     this.pionks.push(pionek);
   }
 
@@ -173,6 +177,12 @@ export class Game implements GameInter {
 
       localStorage.setItem("best", String(this.score));
 
+      let allKilled = true;
+      for (const key in this.viruses) {
+        const virus: HTMLDivElement = this.viruses[key];
+        if (virus.style.display !== "none") allKilled = false;
+      }
+      if (allKilled) this.renderAlert("stageCompleted");
       this.renderScore();
     }
   }
@@ -228,6 +238,14 @@ export class Game implements GameInter {
     this.checkForZbicie(pionek);
     this.renderPionek();
   };
+
+  public checkBordersOnRotation(x, y) {
+    // const index = this.allCells.findIndex(
+    //   (el) => el.div !== null && el.x == x && el.y == y
+    // );
+    // if (index == -1) return true;
+    // else return false;
+  }
 
   public checkBorderPionks = (pionek: Pionek) => {
     let wynik = false;
@@ -480,4 +498,23 @@ export class Game implements GameInter {
 
     return url;
   };
+  renderAlert(msg) {
+    const pos = this.data[msg].pos;
+
+    let canvas = document.createElement("canvas");
+    canvas.width = pos.w;
+    canvas.height = 118;
+    let ctx = canvas.getContext("2d");
+
+    ctx.drawImage(this.img, pos.x0, pos.y0, pos.w, pos.h, 0, 0, pos.w, pos.h);
+
+    let url = canvas.toDataURL();
+    this.alertCon.style.backgroundImage = "url('" + url + "')";
+    if (msg == "gameOver") {
+      this.alertLooseCon.style.backgroundImage = "url('" + url + "')";
+    } else {
+      this.alertCon.style.backgroundImage = "url('" + url + "')";
+    }
+    this.stop = true;
+  }
 }

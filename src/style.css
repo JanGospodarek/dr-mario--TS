@@ -74,6 +74,20 @@ body {
   left: 40px;
   top: 123px;
 }
+#alertLoose {
+  width: 332px;
+  height: 118px;
+  position: absolute;
+  top: 38%;
+  left: 27%;
+}
+#alert {
+  width: 422px;
+  height: 118px;
+  position: absolute;
+  top: 38%;
+  left: 18%;
+}
 /* start */
 
 div#yellow.first-step {
