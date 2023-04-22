@@ -159,11 +159,38 @@ export class Game implements GameInter {
     }, 2000);
   }
 
-  private renderScore() {
-    if (this.score > this.bestScore) {
-      this.bestScore = this.score;
-    }
+  private checkIfVirusWasKilled() {
+    const indexOfVirus = this.cellsToDelete.findIndex(
+      (el) => el.flag == "virus"
+    );
+    if (indexOfVirus !== -1) {
+      const virusCell: Cell = this.cellsToDelete[indexOfVirus];
+      console.log(virusCell.color);
 
+      switch (virusCell.color) {
+        case "#FFFF00":
+          this.viruses.yellow.style.display = "none";
+          break;
+        case "#FF0000":
+          this.viruses.red.style.display = "none";
+          break;
+        case "#0000FF":
+          this.viruses.blue.style.display = "none";
+          break;
+        default:
+          break;
+      }
+
+      this.score += 100;
+      if (this.score > this.bestScore) this.bestScore = this.score;
+
+      localStorage.setItem("best", String(this.score));
+
+      this.renderScore();
+    }
+  }
+
+  private renderScore() {
     const curStr = String(this.score).padStart(8, "0");
     const bestStr = String(this.bestScore).padStart(8, "0");
 
@@ -314,20 +341,6 @@ export class Game implements GameInter {
           });
         }
       });
-    }
-  }
-
-  private checkIfVirusWasKilled() {
-    const indexOfVirus = this.cellsToDelete.findIndex(
-      (el) => el.flag == "virus"
-    );
-    if (indexOfVirus !== -1) {
-      this.score += 100;
-      if (this.score > this.bestScore) this.bestScore = this.score;
-
-      localStorage.setItem("best", String(this.score));
-
-      this.renderScore();
     }
   }
 
