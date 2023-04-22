@@ -347,6 +347,7 @@ export class Game implements GameInter {
         cell.div = null;
         cell.color = "none";
         cell.flag = "zbite";
+        return;
       }
       cell.div.style.backgroundImage =
         "url('" + this.getBackgroundUrlDestroy(index, cell.color) + "')";
