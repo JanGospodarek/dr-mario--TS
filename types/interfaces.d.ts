@@ -15,6 +15,7 @@ export interface Cell {
   div: HTMLDivElement | null;
   color: string;
   flag: string;
+  id: string;
 }
 // export interface PionekInter {
 //   boardDiv: HTMLDivElement;

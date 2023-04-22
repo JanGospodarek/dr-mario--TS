@@ -106,7 +106,7 @@ export class Game implements GameInter {
 
   private renderPionek() {
     //prettier-ignore
-    const pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.data,this.img);
+    const pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrlPill);
     this.pionks.push(pionek);
   }
 
@@ -114,7 +114,7 @@ export class Game implements GameInter {
     const indexes = [];
 
     while (indexes.length < 3) {
-      const index = 40 + Math.floor(Math.random() * 60);
+      const index = 60 + Math.floor(Math.random() * 60);
       if (indexes.indexOf(index) === -1) indexes.push(index);
     }
 
@@ -222,6 +222,7 @@ export class Game implements GameInter {
 
       this.allCells[index].color = c.color;
       this.allCells[index].div = c.div;
+      this.allCells[index].id = c.id;
     }
 
     this.checkForZbicie(pionek);
@@ -317,22 +318,41 @@ export class Game implements GameInter {
               (el) => el.x == cell.x && el.y == cell.y
             );
             const cellToDelete = this.allCells[index];
+            const id = cellToDelete.id;
+            cellToDelete.id = null;
 
-            cellToDelete.div.style.display = "none";
-            cellToDelete.div.remove();
-            cellToDelete.div = null;
-
-            cellToDelete.color = "none";
-            cellToDelete.flag = "zbite";
-            console.log(cellToDelete);
-
+            const siblingIndex = this.allCells.findIndex((el) => el.id == id);
+            if (
+              siblingIndex !== -1 &&
+              this.allCells[siblingIndex].div !== null
+            ) {
+              const cell = this.allCells[siblingIndex];
+              cell.div.style.backgroundImage =
+                "url('" + this.getBackgroundUrlPill("one", cell.color) + "')";
+            }
+            this.destroyAnimation(cellToDelete);
             this.spadamyPanowie();
           });
         }
       });
     }
   }
+  private destroyAnimation(cell: Cell) {
+    let index = 0;
 
+    let i = setInterval(() => {
+      if (index == 2) {
+        clearInterval(i);
+        cell.div.style.display = "none";
+        cell.div = null;
+        cell.color = "none";
+        cell.flag = "zbite";
+      }
+      cell.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrlDestroy(index, cell.color) + "')";
+      index++;
+    }, 100);
+  }
   private spadamyPanowie() {
     // let opadlo;
     // const opadanie = () => {
@@ -402,4 +422,61 @@ export class Game implements GameInter {
     let url = canvas.toDataURL();
     return url;
   }
+
+  private getBackgroundUrlPill = (direction, color) => {
+    let canvas = document.createElement("canvas");
+    canvas.width = 17;
+    canvas.height = 17;
+    let ctx = canvas.getContext("2d");
+    const firtsLetter = color[0].toUpperCase();
+    const arr = color.split("");
+    arr.shift();
+    arr.unshift(firtsLetter);
+
+    const pos = this.data[`cell${arr.join("")}`];
+
+    ctx.drawImage(
+      this.img,
+      pos[direction].x0,
+      pos[direction].y0,
+      pos[direction].w,
+      pos[direction].h,
+      0,
+      0,
+      pos[direction].w,
+      pos[direction].h
+    );
+
+    let url = canvas.toDataURL();
+
+    return url;
+  };
+  private getBackgroundUrlDestroy = (index, color) => {
+    let canvas = document.createElement("canvas");
+    canvas.width = 17;
+    canvas.height = 17;
+    let ctx = canvas.getContext("2d");
+    const firtsLetter = color[0].toUpperCase();
+    const arr = color.split("");
+    arr.shift();
+    arr.unshift(firtsLetter);
+
+    const pos = this.data[`cell${arr.join("")}`];
+
+    ctx.drawImage(
+      this.img,
+      pos.animation[index].x0,
+      pos.animation[index].y0,
+      pos.animation[index].w,
+      pos.animation[index].h,
+      0,
+      0,
+      pos.animation[index].w,
+      pos.animation[index].h
+    );
+
+    let url = canvas.toDataURL();
+
+    return url;
+  };
 }

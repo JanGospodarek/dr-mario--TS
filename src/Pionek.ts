@@ -3,14 +3,28 @@ import genUniqueId from "./utils/genUniqueId";
 
 export class Pionek {
   private btn = <HTMLDivElement>document.getElementById("stop");
+  id = genUniqueId();
 
   cells: Cells = {
-    left: { x: 51, y: 0, div: null, color: "none", flag: "normal" },
-    right: { x: 68, y: 0, div: null, color: "none", flag: "normal" },
+    left: {
+      x: 51,
+      y: 0,
+      div: null,
+      color: "none",
+      flag: "normal",
+      id: this.id,
+    },
+    right: {
+      x: 68,
+      y: 0,
+      div: null,
+      color: "none",
+      flag: "normal",
+      id: this.id,
+    },
   };
-  private possibleColors = ["red", "yellow", "blue"];
 
-  id = genUniqueId();
+  private possibleColors = ["red", "yellow", "blue"];
 
   CELL_WIDTH = 17;
   BOARD_WIDTH = 135;
@@ -26,8 +40,8 @@ export class Pionek {
     private checkBorderPionks: Function,
     private renewGame: Function,
     private checkCollisionsOnMove: Function,
-    private data: any,
-    private img: any
+
+    private getBackgroundUrl
   ) {
     this.buildPionek();
     this.moving();
@@ -38,34 +52,6 @@ export class Pionek {
     this.btn.addEventListener("click", () => {
       clearInterval(this.movingInterval);
     });
-  }
-  private getBackgroundUrl(direction, color) {
-    let canvas = document.createElement("canvas");
-    canvas.width = 17;
-    canvas.height = 17;
-    let ctx = canvas.getContext("2d");
-    const firtsLetter = color[0].toUpperCase();
-    const arr = color.split("");
-    arr.shift();
-    arr.unshift(firtsLetter);
-
-    const pos = this.data[`cell${arr.join("")}`];
-
-    ctx.drawImage(
-      this.img,
-      pos[direction].x0,
-      pos[direction].y0,
-      pos[direction].w,
-      pos[direction].h,
-      0,
-      0,
-      pos[direction].w,
-      pos[direction].h
-    );
-
-    let url = canvas.toDataURL();
-
-    return url;
   }
 
   private buildPionek() {
