@@ -31,7 +31,7 @@ export class Game implements GameInter {
     "fifth-step",
     "sixth-step",
   ];
-  possibleColors = ["#FF0000", "#FFFF00", "#0000FF"];
+  possibleColors = ["red", "yellow", "blue"];
 
   data: any;
   img: any;
@@ -106,7 +106,7 @@ export class Game implements GameInter {
 
   private renderPionek() {
     //prettier-ignore
-    const pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove);
+    const pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.data,this.img);
     this.pionks.push(pionek);
   }
 
@@ -165,21 +165,8 @@ export class Game implements GameInter {
     );
     if (indexOfVirus !== -1) {
       const virusCell: Cell = this.cellsToDelete[indexOfVirus];
-      console.log(virusCell.color);
 
-      switch (virusCell.color) {
-        case "#FFFF00":
-          this.viruses.yellow.style.display = "none";
-          break;
-        case "#FF0000":
-          this.viruses.red.style.display = "none";
-          break;
-        case "#0000FF":
-          this.viruses.blue.style.display = "none";
-          break;
-        default:
-          break;
-      }
+      this.viruses[virusCell.color].style.display = "none";
 
       this.score += 100;
       if (this.score > this.bestScore) this.bestScore = this.score;
@@ -331,11 +318,13 @@ export class Game implements GameInter {
             );
             const cellToDelete = this.allCells[index];
 
+            cellToDelete.div.style.display = "none";
             cellToDelete.div.remove();
             cellToDelete.div = null;
 
             cellToDelete.color = "none";
             cellToDelete.flag = "zbite";
+            console.log(cellToDelete);
 
             this.spadamyPanowie();
           });
@@ -384,31 +373,31 @@ export class Game implements GameInter {
   //     cell.div.style.top = cell.x + "px";
   //   });
   // }
-  private getBackgroundUrlVirus(data, color) {
+  private getBackgroundUrlVirus(data, color: string) {
     let canvas = document.createElement("canvas");
     canvas.width = 15;
     canvas.height = 15;
     let ctx = canvas.getContext("2d");
 
     //prettier-ignore
+    const firtsLetter = color[0].toUpperCase()
+    const arr = color.split("");
+    arr.shift();
+    arr.unshift(firtsLetter);
 
-    switch (color) {
-      case "#FF0000":
-        console.log(data.virusRed);
-      
-        ctx.drawImage(this.img, data.virusRed.pos.x0, data.virusRed.pos.y0, data.virusRed.pos.w, data.virusRed.pos.h, 0, 0, data.virusRed.pos.w, data.virusRed.pos.h);
+    console.log(data.virusRed);
 
-        break;
-      case '#0000FF':
-        ctx.drawImage(this.img, data.virusBlue.pos.x0, data.virusBlue.pos.y0, data.virusBlue.pos.w, data.virusBlue.pos.h, 0, 0, data.virusBlue.pos.w, data.virusBlue.pos.h);
-  
-        break;
-      case '#FFFF00':
-        ctx.drawImage(this.img, data.virusYellow.pos.x0, data.virusYellow.pos.y0, data.virusYellow.pos.w, data.virusYellow.pos.h, 0, 0, data.virusYellow.pos.w, data.virusYellow.pos.h);
-  
-        break;
-     
-    }
+    ctx.drawImage(
+      this.img,
+      data[`virus${arr.join("")}`].pos.x0,
+      data[`virus${arr.join("")}`].pos.y0,
+      data[`virus${arr.join("")}`].pos.w,
+      data[`virus${arr.join("")}`].pos.h,
+      0,
+      0,
+      data[`virus${arr.join("")}`].pos.w,
+      data[`virus${arr.join("")}`].pos.h
+    );
 
     let url = canvas.toDataURL();
     return url;

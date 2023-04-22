@@ -8,7 +8,7 @@ export class Pionek {
     left: { x: 51, y: 0, div: null, color: "none", flag: "normal" },
     right: { x: 68, y: 0, div: null, color: "none", flag: "normal" },
   };
-  private possibleColors = ["#FF0000", "#FFFF00", "#0000FF"];
+  private possibleColors = ["red", "yellow", "blue"];
 
   id = genUniqueId();
 
@@ -25,15 +25,47 @@ export class Pionek {
     private boardDiv: HTMLDivElement,
     private checkBorderPionks: Function,
     private renewGame: Function,
-    private checkCollisionsOnMove: Function
+    private checkCollisionsOnMove: Function,
+    private data: any,
+    private img: any
   ) {
     this.buildPionek();
     this.moving();
     this.addControls();
+    this.renderSkin();
+
     ///development proposes
     this.btn.addEventListener("click", () => {
       clearInterval(this.movingInterval);
     });
+  }
+  private getBackgroundUrl(direction, color) {
+    let canvas = document.createElement("canvas");
+    canvas.width = 17;
+    canvas.height = 17;
+    let ctx = canvas.getContext("2d");
+    const firtsLetter = color[0].toUpperCase();
+    const arr = color.split("");
+    arr.shift();
+    arr.unshift(firtsLetter);
+
+    const pos = this.data[`cell${arr.join("")}`];
+
+    ctx.drawImage(
+      this.img,
+      pos[direction].x0,
+      pos[direction].y0,
+      pos[direction].w,
+      pos[direction].h,
+      0,
+      0,
+      pos[direction].w,
+      pos[direction].h
+    );
+
+    let url = canvas.toDataURL();
+
+    return url;
   }
 
   private buildPionek() {
@@ -45,7 +77,7 @@ export class Pionek {
       const colorIndex = this.getColor();
 
       cell.style.backgroundColor = this.possibleColors[colorIndex];
-      cell.innerText = String(index);
+      // cell.innerText = String(index);
       cell.classList.add("pionek-cell");
 
       this.boardDiv.append(cell);
@@ -209,18 +241,11 @@ export class Pionek {
     if (letter == "r") {
       if (xSpan == this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-this.CELL_WIDTH)
         this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-this.CELL_WIDTH)
       }
       if (xSpan == 0 && ySpan == -this.CELL_WIDTH) {
         //prettier-ignore
-        // this.updateBothCoordinates(undefined,undefined,this.cells.left.x-this.CELL_WIDTH,this.cells.left.y)
-        this.updateBothCoordinates(
-          this.cells.left.x + this.CELL_WIDTH,
-          this.cells.left.y,
-          this.cells.right.x,
-          this.cells.right.y + this.CELL_WIDTH
-        );
+        this.updateBothCoordinates(this.cells.left.x + this.CELL_WIDTH,this.cells.left.y,this.cells.right.x, this.cells.right.y + this.CELL_WIDTH );
       }
       if (xSpan == -this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
@@ -251,7 +276,37 @@ export class Pionek {
       }
     }
   }
+  private renderSkin() {
+    if (this.cells.left.y === this.cells.right.y - 17) {
+      this.cells.left.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("top", this.cells.left.color) + "')";
+      this.cells.right.div.style.backgroundImage =
+        "url('" +
+        this.getBackgroundUrl("bottom", this.cells.right.color) +
+        "')";
+    }
 
+    if (this.cells.left.y === this.cells.right.y + 17) {
+      this.cells.left.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("bottom", this.cells.left.color) + "')";
+      this.cells.right.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("top", this.cells.right.color) + "')";
+    }
+
+    if (this.cells.left.x === this.cells.right.x - 17) {
+      this.cells.left.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("left", this.cells.left.color) + "')";
+      this.cells.right.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("right", this.cells.right.color) + "')";
+    }
+
+    if (this.cells.left.x === this.cells.right.x + 17) {
+      this.cells.left.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("right", this.cells.left.color) + "')";
+      this.cells.right.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("left", this.cells.right.color) + "')";
+    }
+  }
   private updateBothCoordinates(
     xLeft: number | undefined,
     yLeft: number | undefined,
@@ -283,5 +338,6 @@ export class Pionek {
       this.cells.right.x = xRight;
       this.cells.right.div.style.left = xRight + "px";
     }
+    this.renderSkin();
   }
 }
