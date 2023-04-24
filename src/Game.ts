@@ -7,6 +7,7 @@ export class Game implements GameInter {
   boardCon = <HTMLDivElement>document.getElementById("board");
   curScoreCon = <HTMLDivElement>document.getElementById("cur-cont");
   bestScoreCon = <HTMLDivElement>document.getElementById("top-cont");
+  aliveNumCont = <HTMLDivElement>document.getElementById("alive-num");
   alertCon = <HTMLDivElement>document.getElementById("alert");
   alertLooseCon = <HTMLDivElement>document.getElementById("alertLoose");
   viruses = {
@@ -24,7 +25,7 @@ export class Game implements GameInter {
   pionks: Pionek[] = [];
   allCells: Cell[] = [];
   cellsToDelete: Cell[] = [];
-
+  aliveViruses = 4;
   steps = [
     "first-step",
     "second-step",
@@ -33,7 +34,7 @@ export class Game implements GameInter {
     "fifth-step",
     "sixth-step",
   ];
-  possibleColors = ["red", "yellow", "blue"];
+  possibleColors = ["red", "yellow", "blue", "blue"];
 
   data: any;
   img: any;
@@ -68,6 +69,7 @@ export class Game implements GameInter {
           this.renderViruses(data);
           this.renderScore();
           this.renderScore();
+          this.renderNumOfViruses();
           this.animateViruses();
         };
       });
@@ -117,7 +119,7 @@ export class Game implements GameInter {
   private renderViruses(data) {
     const indexes = [];
 
-    while (indexes.length < 3) {
+    while (indexes.length < 4) {
       const index = 60 + Math.floor(Math.random() * 60);
       if (indexes.indexOf(index) === -1) indexes.push(index);
     }
@@ -170,18 +172,15 @@ export class Game implements GameInter {
     if (indexOfVirus !== -1) {
       const virusCell: Cell = this.cellsToDelete[indexOfVirus];
 
-      this.viruses[virusCell.color].style.display = "none";
-
+      // this.viruses[virusCell.color].style.display = "none";
+      this.aliveViruses--;
+      this.renderNumOfViruses();
       this.score += 100;
       if (this.score > this.bestScore) this.bestScore = this.score;
 
       localStorage.setItem("best", String(this.score));
-
-      let allKilled = true;
-      for (const key in this.viruses) {
-        const virus: HTMLDivElement = this.viruses[key];
-        if (virus.style.display !== "none") allKilled = false;
-      }
+      let allKilled = false;
+      if (this.aliveViruses == 0) allKilled = true;
       if (allKilled) this.renderAlert("stageCompleted");
       this.renderScore();
     }
@@ -194,7 +193,10 @@ export class Game implements GameInter {
     this.renderScoreHelper(curStr, this.curScoreCon);
     this.renderScoreHelper(bestStr, this.bestScoreCon);
   }
-
+  private renderNumOfViruses() {
+    const aliveStr = String(this.aliveViruses).padStart(2, "0");
+    this.renderScoreHelper(aliveStr, this.aliveNumCont);
+  }
   renderScoreHelper(str: string, place: HTMLDivElement) {
     let canvas = document.createElement("canvas");
     let ctx = canvas.getContext("2d");

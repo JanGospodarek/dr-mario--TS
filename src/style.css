@@ -74,6 +74,16 @@ body {
   left: 40px;
   top: 123px;
 }
+#alive-num {
+  width: 48px;
+  height: 30px;
+  position: absolute;
+  background-color: black;
+  transform: scale(0.7);
+  background-repeat: no-repeat;
+  left: 555px;
+  top: 330px;
+}
 #alertLoose {
   width: 332px;
   height: 118px;
