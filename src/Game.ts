@@ -309,13 +309,13 @@ export class Game implements GameInter {
     if (!this.stop) this.pionek.throwPill();
   };
 
-  public checkBordersOnRotation(x, y) {
-    // const index = this.allCells.findIndex(
-    //   (el) => el.div !== null && el.x == x && el.y == y
-    // );
-    // if (index == -1) return true;
-    // else return false;
-  }
+  public checkBordersOnRotation = (x, y) => {
+    const index = this.allCells.findIndex(
+      (el) => el.div !== null && el.x == x && el.y == y
+    );
+    if (index == -1) return true;
+    else return false;
+  };
 
   public checkBorderPionks = (pionek: Pionek) => {
     let wynik = false;
@@ -480,12 +480,6 @@ export class Game implements GameInter {
     // opadanie();
   }
 
-  // private reRender() {
-  //   this.allCells.forEach((cell) => {
-  //     if (cell.div == null) return;
-  //     cell.div.style.top = cell.x + "px";
-  //   });
-  // }
   private getBackgroundUrlVirus(data, color: string) {
     let canvas = document.createElement("canvas");
     canvas.width = 15;

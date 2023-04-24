@@ -5,24 +5,6 @@ export class Pionek {
   private btn = <HTMLDivElement>document.getElementById("stop");
   id = genUniqueId();
 
-  // cells: Cells = {
-  //   left: {
-  //     x: 51,
-  //     y: 0,
-  //     div: null,
-  //     color: "none",
-  //     flag: "normal",
-  //     id: this.id,
-  //   },
-  //   right: {
-  //     x: 68,
-  //     y: 0,
-  //     div: null,
-  //     color: "none",
-  //     flag: "normal",
-  //     id: this.id,
-  //   },
-  // };
   cells: Cells = {
     left: {
       x: 220,
@@ -269,18 +251,22 @@ export class Pionek {
     if (letter == "r") {
       if (xSpan == this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x,this.cells.left.y-this.CELL_WIDTH))
         this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-this.CELL_WIDTH)
       }
       if (xSpan == 0 && ySpan == -this.CELL_WIDTH) {
         //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x + this.CELL_WIDTH,this.cells.left.y)&&this.checkBordersOnRotation(this.cells.right.x, this.cells.right.y + this.CELL_WIDTH))
         this.updateBothCoordinates(this.cells.left.x + this.CELL_WIDTH,this.cells.left.y,this.cells.right.x, this.cells.right.y + this.CELL_WIDTH );
       }
       if (xSpan == -this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH))
         this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH,undefined,undefined)
       }
       if (xSpan == 0 && ySpan == this.CELL_WIDTH) {
         //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x,this.cells.left.y+this.CELL_WIDTH)&&this.checkBordersOnRotation(this.cells.left.x+this.CELL_WIDTH,this.cells.right.y))
         this.updateBothCoordinates(this.cells.left.x,this.cells.left.y+this.CELL_WIDTH,this.cells.left.x+this.CELL_WIDTH,this.cells.right.y)
       }
     }
@@ -288,24 +274,28 @@ export class Pionek {
     if (letter == "t") {
       if (xSpan == this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH))
         this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH,undefined,undefined)
       }
       if (xSpan == 0 && ySpan == -this.CELL_WIDTH) {
         //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x-this.CELL_WIDTH,this.cells.left.y)&&this.checkBordersOnRotation(this.cells.right.x,this.cells.right.y+this.CELL_WIDTH))
         this.updateBothCoordinates(this.cells.left.x-this.CELL_WIDTH,this.cells.left.y,this.cells.right.x,this.cells.right.y+this.CELL_WIDTH)
       }
       if (xSpan == -this.CELL_WIDTH && ySpan == 0) {
         //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x,this.cells.left.y)&&this.checkBordersOnRotation(this.cells.right.x+this.CELL_WIDTH,this.cells.left.y-this.CELL_WIDTH))
         this.updateBothCoordinates(this.cells.left.x,this.cells.left.y,this.cells.right.x+this.CELL_WIDTH,this.cells.left.y-this.CELL_WIDTH)
       }
       if (xSpan == 0 && ySpan == this.CELL_WIDTH) {
         //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x,this.cells.right.y)&&this.checkBordersOnRotation(this.cells.right.x-this.CELL_WIDTH,this.cells.right.y))
         this.updateBothCoordinates(this.cells.left.x,this.cells.right.y,this.cells.right.x-this.CELL_WIDTH,this.cells.right.y)
       }
     }
   }
   private renderSkin() {
-    if (this.cells.left.y === this.cells.right.y - 17) {
+    if (this.cells.left.y === this.cells.right.y - this.CELL_WIDTH) {
       this.cells.left.div.style.backgroundImage =
         "url('" + this.getBackgroundUrl("top", this.cells.left.color) + "')";
       this.cells.right.div.style.backgroundImage =
@@ -314,21 +304,21 @@ export class Pionek {
         "')";
     }
 
-    if (this.cells.left.y === this.cells.right.y + 17) {
+    if (this.cells.left.y === this.cells.right.y + this.CELL_WIDTH) {
       this.cells.left.div.style.backgroundImage =
         "url('" + this.getBackgroundUrl("bottom", this.cells.left.color) + "')";
       this.cells.right.div.style.backgroundImage =
         "url('" + this.getBackgroundUrl("top", this.cells.right.color) + "')";
     }
 
-    if (this.cells.left.x === this.cells.right.x - 17) {
+    if (this.cells.left.x === this.cells.right.x - this.CELL_WIDTH) {
       this.cells.left.div.style.backgroundImage =
         "url('" + this.getBackgroundUrl("left", this.cells.left.color) + "')";
       this.cells.right.div.style.backgroundImage =
         "url('" + this.getBackgroundUrl("right", this.cells.right.color) + "')";
     }
 
-    if (this.cells.left.x === this.cells.right.x + 17) {
+    if (this.cells.left.x === this.cells.right.x + this.CELL_WIDTH) {
       this.cells.left.div.style.backgroundImage =
         "url('" + this.getBackgroundUrl("right", this.cells.left.color) + "')";
       this.cells.right.div.style.backgroundImage =
