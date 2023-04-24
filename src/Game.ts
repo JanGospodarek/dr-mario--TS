@@ -7,6 +7,7 @@ export class Game implements GameInter {
   boardCon = <HTMLDivElement>document.getElementById("board");
   curScoreCon = <HTMLDivElement>document.getElementById("cur-cont");
   bestScoreCon = <HTMLDivElement>document.getElementById("top-cont");
+  handCont = <HTMLDivElement>document.getElementById("hand-cont");
   aliveNumCont = <HTMLDivElement>document.getElementById("alive-num");
   alertCon = <HTMLDivElement>document.getElementById("alert");
   alertLooseCon = <HTMLDivElement>document.getElementById("alertLoose");
@@ -71,6 +72,7 @@ export class Game implements GameInter {
           this.renderScore();
           this.renderNumOfViruses();
           this.animateViruses();
+          this.renderHand(2);
         };
       });
   }
@@ -114,6 +116,59 @@ export class Game implements GameInter {
     //prettier-ignore
     const pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrlPill,this.checkBordersOnRotation);
     this.pionks.push(pionek);
+  }
+
+  renderHand(index: number) {
+    const frames = this.data.hand.frames[index];
+    let canvas = document.createElement("canvas");
+    canvas.width = 60;
+    canvas.height = 90;
+    let ctx = canvas.getContext("2d");
+    if (index == 2) {
+      const frame = frames["top"];
+
+      ctx.drawImage(
+        this.img,
+        frame.x0,
+        frame.y0,
+        frame.w,
+        frame.h,
+        35,
+        50,
+        frame.w,
+        frame.h
+      );
+    } else {
+      let i = 0;
+      let x,
+        y = 0;
+      if (index == 0) {
+        x = 36;
+        y = 3;
+      } else {
+        x = 12;
+        y = 24;
+      }
+      for (const key in frames) {
+        const frame = frames[key];
+        ctx.drawImage(
+          this.img,
+          frame.x0,
+          frame.y0,
+          frame.w,
+          frame.h,
+          x,
+          y + frame.h * i,
+          frame.w,
+          frame.h
+        );
+        i++;
+      }
+    }
+
+    let url = canvas.toDataURL();
+
+    this.handCont.style.backgroundImage = "url('" + url + "')";
   }
 
   private renderViruses(data) {

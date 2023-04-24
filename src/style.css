@@ -74,6 +74,17 @@ body {
   left: 40px;
   top: 123px;
 }
+#hand-cont {
+  position: absolute;
+  /* background-color: black; */
+  /* border: 1px solid red; */
+  height: 90px;
+  width: 60px;
+  top: 49px;
+  left: 464px;
+  background-repeat: no-repeat;
+  transform: scale(0.7);
+}
 #alive-num {
   width: 48px;
   height: 30px;
