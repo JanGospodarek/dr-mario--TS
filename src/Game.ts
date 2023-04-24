@@ -23,9 +23,10 @@ export class Game implements GameInter {
   destId = "board-img-cont";
   gameId = genUniqueId();
   stop = false;
-  pionks: Pionek[] = [];
+  first = true;
   allCells: Cell[] = [];
   cellsToDelete: Cell[] = [];
+  pionek: Pionek;
   aliveViruses = 4;
   steps = [
     "first-step",
@@ -110,15 +111,18 @@ export class Game implements GameInter {
     dest.style.backgroundImage = "url('" + url + "')";
   }
 
-  private renderPionek() {
+  private renderPionek = () => {
     if (this.stop) return;
 
     //prettier-ignore
-    const pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrlPill,this.checkBordersOnRotation);
-    this.pionks.push(pionek);
-  }
+    this.pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrlPill,this.checkBordersOnRotation,this.data,this.renderHand,this.renderPionek);
+    if (this.first) {
+      this.pionek.throwPill();
+      this.first = false;
+    }
+  };
 
-  renderHand(index: number) {
+  renderHand = (index: number) => {
     const frames = this.data.hand.frames[index];
     let canvas = document.createElement("canvas");
     canvas.width = 60;
@@ -169,7 +173,7 @@ export class Game implements GameInter {
     let url = canvas.toDataURL();
 
     this.handCont.style.backgroundImage = "url('" + url + "')";
-  }
+  };
 
   private renderViruses(data) {
     const indexes = [];
@@ -226,11 +230,19 @@ export class Game implements GameInter {
     );
     if (indexOfVirus !== -1) {
       const virusCell: Cell = this.cellsToDelete[indexOfVirus];
-
+      const id = virusCell.id;
+      const indexOfVirus2 = this.cellsToDelete.findIndex(
+        (el) => el.flag == "virus" && el.id != id
+      );
+      if (indexOfVirus2 !== -1) {
+        this.aliveViruses -= 2;
+        this.score += 200;
+      } else {
+        this.aliveViruses--;
+        this.score += 100;
+      }
       // this.viruses[virusCell.color].style.display = "none";
-      this.aliveViruses--;
       this.renderNumOfViruses();
-      this.score += 100;
       if (this.score > this.bestScore) this.bestScore = this.score;
 
       localStorage.setItem("best", String(this.score));
@@ -293,7 +305,8 @@ export class Game implements GameInter {
     }
 
     this.checkForZbicie(pionek);
-    this.renderPionek();
+    // this.renderPionek();
+    if (!this.stop) this.pionek.throwPill();
   };
 
   public checkBordersOnRotation(x, y) {

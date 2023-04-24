@@ -29,7 +29,6 @@ export interface Cell {
 // }
 export interface GameInter {
   boardCon: HTMLDivElement;
-  pionks: Pionek[];
   allCells: Cell[];
   score: number;
   cellsToDelete: Cell[];

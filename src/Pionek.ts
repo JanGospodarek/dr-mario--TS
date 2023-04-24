@@ -5,25 +5,42 @@ export class Pionek {
   private btn = <HTMLDivElement>document.getElementById("stop");
   id = genUniqueId();
 
+  // cells: Cells = {
+  //   left: {
+  //     x: 51,
+  //     y: 0,
+  //     div: null,
+  //     color: "none",
+  //     flag: "normal",
+  //     id: this.id,
+  //   },
+  //   right: {
+  //     x: 68,
+  //     y: 0,
+  //     div: null,
+  //     color: "none",
+  //     flag: "normal",
+  //     id: this.id,
+  //   },
+  // };
   cells: Cells = {
     left: {
-      x: 51,
-      y: 0,
+      x: 220,
+      y: -50,
       div: null,
       color: "none",
       flag: "normal",
       id: this.id,
     },
     right: {
-      x: 68,
-      y: 0,
+      x: 237,
+      y: -50,
       div: null,
       color: "none",
       flag: "normal",
       id: this.id,
     },
   };
-
   private possibleColors = ["red", "yellow", "blue"];
 
   CELL_WIDTH = 17;
@@ -41,19 +58,49 @@ export class Pionek {
     private renewGame: Function,
     private checkCollisionsOnMove: Function,
     private getBackgroundUrl: Function,
-    private checkBordersOnRotation: Function
+    private checkBordersOnRotation: Function,
+    private data: any,
+    private renderHand: Function,
+    private renderPionek: Function
   ) {
     this.buildPionek();
-    this.moving();
-    this.addControls();
     this.renderSkin();
+    this.renderHand(0);
+    // this.throwPill();
 
     ///development proposes
     this.btn.addEventListener("click", () => {
       clearInterval(this.movingInterval);
     });
   }
+  public throwPill = () => {
+    let index = 0;
+    let i = setInterval(() => {
+      if (index == this.data.throwPill.frames.length) {
+        clearInterval(i);
+        this.renderPionek();
+        this.moving();
+        this.addControls();
+        return;
+      }
+      const frame = this.data.throwPill.frames[index];
+      for (const key in this.cells) {
+        const cell: Cell = this.cells[key];
+        cell.x = frame[key].x;
 
+        frame[key].y !== 0
+          ? (cell.y = frame[key].y + 5)
+          : (cell.y = frame[key].y);
+        cell.div.style.top = `${String(cell.y)}px`;
+        cell.div.style.left = `${String(cell.x)}px`;
+        this.renderSkin();
+        if (index < 8) this.renderHand(0);
+        else if (index < 16) this.renderHand(1);
+        else if (index < 25) this.renderHand(2);
+      }
+      index++;
+    }, 60);
+  };
   private buildPionek() {
     let fristColor: number | null = null;
 
