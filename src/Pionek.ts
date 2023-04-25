@@ -1,174 +1,315 @@
+import { Cells, Cell } from "../types/interfaces";
+import genUniqueId from "./utils/genUniqueId";
+
 export class Pionek {
-  private boardDiv: HTMLDivElement;
-  public pionek!: HTMLDivElement;
-  private movingInterval: any;
-  private possibleColors = [
-    "#BB8FCE",
-    "#85C1E9",
-    "#F7DC6F",
-    "#F1948A",
-    "#E59866",
-  ];
+  private btn = <HTMLDivElement>document.getElementById("stop");
+  id = genUniqueId();
+  //prettier-ignore
+  cells: Cells = {
+    left: {x: 220,y: -50,div: null,color: "none",flag: "normal",id: this.id,},
+    right: {x: 237,y: -50,div: null,color: "none",flag: "normal",id: this.id,},
+  };
+  private possibleColors = ["red", "yellow", "blue"];
+
+  CELL_WIDTH = 17;
+  BOARD_WIDTH = 135;
+  BOARD_HEIGHT = 255;
+
   private stop = false;
-  private checkBorderPionks: Function;
-  private renewGame: Function;
   private manualMovingDown = false;
-  ///
-  public position = { x: 60, y: 0 };
-  public rotation = 0;
+
+  private movingInterval: any;
 
   constructor(
-    boardDiv: HTMLDivElement,
-    renew: Function,
-    checkBorderPionks: Function
+    private boardDiv: HTMLDivElement,
+    private checkBorderPionks: Function,
+    private renewGame: Function,
+    private checkCollisionsOnMove: Function,
+    private getBackgroundUrl: Function,
+    private checkBordersOnRotation: Function,
+    private data: any,
+    private renderHand: Function,
+    private renderPionek: Function
   ) {
-    this.boardDiv = boardDiv;
     this.buildPionek();
-    this.moving();
-    this.addControls();
-    this.renewGame = renew;
-    this.checkBorderPionks = checkBorderPionks;
+    this.renderSkin();
+    this.renderHand(0);
   }
-  private getColor(except: number | null) {
-    let i = Math.floor(Math.random() * 5);
 
-    while (i == except) {
-      i = Math.floor(Math.random() * 5);
-    }
-    return i;
-  }
+  public throwPill = () => {
+    let index = 0;
+    let i = setInterval(() => {
+      if (index == this.data.throwPill.frames.length) {
+        clearInterval(i);
+        this.renderPionek();
+        this.moving();
+        this.addControls();
+        return;
+      }
+      const frame = this.data.throwPill.frames[index];
+      for (const key in this.cells) {
+        const cell: Cell = this.cells[key];
+        cell.x = frame[key].x;
+
+        frame[key].y !== 0
+          ? (cell.y = frame[key].y + 5)
+          : (cell.y = frame[key].y);
+
+        cell.div.style.top = `${String(cell.y)}px`;
+        cell.div.style.left = `${String(cell.x)}px`;
+
+        this.renderSkin();
+
+        if (index < 8) this.renderHand(0);
+        else if (index < 16) this.renderHand(1);
+        else if (index < 25) this.renderHand(2);
+      }
+      index++;
+    }, 60);
+  };
   private buildPionek() {
-    this.pionek = document.createElement("div");
-    this.pionek.classList.add("pionek");
-    let fristColor: number | null = null;
-
     for (let index = 0; index < 2; index++) {
-      const cell1 = document.createElement("div");
+      const cell = document.createElement("div");
 
-      const colorIndex = this.getColor(fristColor);
-      fristColor = colorIndex;
-      cell1.style.backgroundColor = this.possibleColors[colorIndex];
+      const colorIndex = this.getColor();
 
-      cell1.classList.add("pionek-cell");
-      //   const pos = { x: 60, y: 0 };
-      //   cell1.setAttribute("data-position", JSON.stringify(pos));
-      this.pionek.append(cell1);
+      cell.style.backgroundColor = this.possibleColors[colorIndex];
+
+      cell.classList.add("pionek-cell");
+
+      this.boardDiv.append(cell);
+
+      let key = "";
+
+      index == 0 ? (key = "left") : (key = "right");
+
+      cell.style.left = this.cells[key].x + "px";
+      cell.style.top = this.cells[key].y + "px";
+
+      this.cells[key].div = cell;
+      this.cells[key].color = this.possibleColors[colorIndex];
     }
+  }
 
-    this.pionek.style.left = "60px";
-    this.boardDiv.append(this.pionek);
+  private getColor() {
+    return Math.floor(Math.random() * 3);
   }
 
   private moving() {
     this.movingInterval = setInterval(() => {
       if (this.manualMovingDown) return;
+      //prettier-ignore
+      if (!this.stop) 
+        this.updateBothCoordinates(undefined,this.cells.left.y + this.CELL_WIDTH,undefined,this.cells.right.y + this.CELL_WIDTH);
 
-      const y = 20 + Number(this.pionek.style.top.split("p")[0]);
-
-      if (this.chechForBorderCollisions(undefined, y, true)) {
+      if (this.checkBottomCollision()) {
         clearInterval(this.movingInterval);
+        this.stop = true;
         this.renewGame(this);
         return;
       }
-      this.position.y = y;
-      this.pionek.style.top = `${y}px`;
-      //   this.updateDatasets({ x: this.position.x, y: this.position.y });
     }, 400);
   }
-  private updateDatasets(obj) {
-    for (let index = 0; index < this.pionek.children.length; index++) {
-      const element = this.pionek.children[index];
-      element.setAttribute("data-position", JSON.stringify(obj));
+
+  private checkLeftCollision() {
+    let wynik1,
+      wynik2 = false;
+    for (const key in this.cells) {
+      const cell: Cell = this.cells[key];
+      if (this.checkCollisionsOnMove(cell.x - this.CELL_WIDTH, cell.y)) {
+        wynik1 = true;
+      }
     }
+
+    if (this.cells.left.x <= 0) wynik2 = true;
+    return wynik1 || wynik2;
   }
-  private chechForBorderCollisions(x: any, y: number, autonomous: boolean) {
-    if (this.checkBorderPionks(this.position, this.rotation)) {
-      console.log("PIONEK!!!!");
+
+  private checkRightCollision() {
+    let wynik1,
+      wynik2 = false;
+    for (const key in this.cells) {
+      const cell: Cell = this.cells[key];
+      if (this.checkCollisionsOnMove(cell.x + this.CELL_WIDTH, cell.y)) {
+        wynik1 = true;
+      }
+    }
+
+    if (this.cells.left.x >= this.BOARD_WIDTH - this.CELL_WIDTH) wynik2 = true;
+    return wynik1 || wynik2;
+  }
+
+  private checkBottomCollision() {
+    if (
+      this.cells.left.y >= this.BOARD_HEIGHT - this.CELL_WIDTH ||
+      this.cells.right.y >= this.BOARD_HEIGHT - this.CELL_WIDTH ||
+      this.checkBorderPionks(this)
+    ) {
       this.stop = true;
       return true;
-    }
-
-    if (autonomous) {
-      if (
-        y >= 300 ||
-        ((this.rotation == 90 || this.rotation == 270) && y >= 280)
-      ) {
-        this.stop = true;
-        return true;
-      }
     } else {
-      if (x <= 0 || x >= 160) {
-        return true;
-      } else if (
-        y >= 300 ||
-        ((this.rotation == 90 || this.rotation == 270) && y >= 280)
-      ) {
-        this.stop = true;
-        return true;
-      }
+      return false;
     }
   }
 
-  private rotate() {
-    const prevRot = this.rotation;
-    if (prevRot == 360) this.rotation = 0;
-    this.rotation += 90;
-    if (this.rotation == 270 || this.rotation == 90) {
-      this.position.x += 10;
-      this.position.y -= 10;
-      this.pionek.style.left = `${this.position.x}px`;
-      this.pionek.style.top = `${this.position.y}px`;
-    }
-    if (this.rotation == 180 || this.rotation == 360) {
-      this.position.x -= 10;
-      this.position.y += 10;
-      this.pionek.style.top = `${this.position.y}px`;
-      this.pionek.style.left = `${this.position.x}px`;
-    }
-    // this.updateDatasets({ x: this.position.x, y: this.position.y });
-    this.pionek.style.transform = `rotate(${this.rotation}deg)`;
-  }
   private addControls() {
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       if (this.stop) return;
       const key = e.key;
-
-      const x = +this.pionek.style.left.split("p")[0];
-      const y = +this.pionek.style.top.split("p")[0];
-
       switch (key) {
         case "ArrowLeft":
-          if (!this.chechForBorderCollisions(x, y, false)) {
-            const span = x - 20;
-            this.pionek.style.left = `${span}px`;
-            this.position.x = span;
-          }
+          if (this.checkLeftCollision()) break;
+          // prettier-ignore
+          this.updateBothCoordinates(this.cells.left.x - this.CELL_WIDTH,undefined,this.cells.right.x - this.CELL_WIDTH,undefined);
+          // prettier-ignore
+          if (this.checkBottomCollision()) {clearInterval(this.movingInterval);this.stop = true;this.renewGame(this);return; }
 
           break;
         case "ArrowRight":
-          if (!this.chechForBorderCollisions(x + 40, y, false)) {
-            const span = x + 20;
-            this.pionek.style.left = `${span}px`;
-            this.position.x = span;
-          }
-
+          if (this.checkRightCollision()) break;
+          // prettier-ignore
+          this.updateBothCoordinates(this.cells.left.x + this.CELL_WIDTH,undefined,this.cells.right.x + this.CELL_WIDTH,undefined);
+          // prettier-ignore
+          if (this.checkBottomCollision()) {clearInterval(this.movingInterval);this.stop = true;this.renewGame(this);return;}
           break;
         case "ArrowDown":
-          if (!this.chechForBorderCollisions(x, y + 20, false)) {
-            this.manualMovingDown = true;
-            const span = y + 20;
-            this.pionek.style.top = `${span}px`;
-            this.position.y = span;
+          this.manualMovingDown = true;
+
+          if (this.checkBottomCollision()) {
+            this.stop = true;
+            break;
           }
+          // prettier-ignore
+          this.updateBothCoordinates(undefined,this.cells.left.y + this.CELL_WIDTH,undefined,this.cells.right.y + this.CELL_WIDTH);
 
           break;
         case "r":
-          this.rotate();
+          const xSpan = this.cells.right.x - this.cells.left.x;
+          const ySpan = this.cells.right.y - this.cells.left.y;
+          this.rotate(xSpan, ySpan, "r");
+
+          break;
+        case "t":
+          const xSpanR = this.cells.right.x - this.cells.left.x;
+          const ySpanR = this.cells.right.y - this.cells.left.y;
+          this.rotate(xSpanR, ySpanR, "t");
+
+          break;
       }
-      //   this.updateDatasets({ x: this.position.x, y: this.position.y });
     });
+
     document.addEventListener("keyup", (e: KeyboardEvent) => {
-      if (e.key == "ArrowDown") this.manualMovingDown = false;
+      if (e.key == "ArrowDown")
+        setTimeout(() => {
+          this.manualMovingDown = false;
+        }, 100);
     });
+  }
+
+  private rotate(xSpan, ySpan, letter) {
+    //refactor!
+    if (letter == "r") {
+      if (xSpan == this.CELL_WIDTH && ySpan == 0) {
+        //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x,this.cells.left.y-this.CELL_WIDTH))
+        this.updateBothCoordinates(undefined,undefined,this.cells.left.x,this.cells.left.y-this.CELL_WIDTH)
+      }
+      if (xSpan == 0 && ySpan == -this.CELL_WIDTH) {
+        //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x + this.CELL_WIDTH,this.cells.left.y)&&this.checkBordersOnRotation(this.cells.right.x, this.cells.right.y + this.CELL_WIDTH))
+        this.updateBothCoordinates(this.cells.left.x + this.CELL_WIDTH,this.cells.left.y,this.cells.right.x, this.cells.right.y + this.CELL_WIDTH );
+      }
+      if (xSpan == -this.CELL_WIDTH && ySpan == 0) {
+        //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH))
+        this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH,undefined,undefined)
+      }
+      if (xSpan == 0 && ySpan == this.CELL_WIDTH) {
+        //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x,this.cells.left.y+this.CELL_WIDTH)&&this.checkBordersOnRotation(this.cells.left.x+this.CELL_WIDTH,this.cells.right.y))
+        this.updateBothCoordinates(this.cells.left.x,this.cells.left.y+this.CELL_WIDTH,this.cells.left.x+this.CELL_WIDTH,this.cells.right.y)
+      }
+    }
+
+    if (letter == "t") {
+      if (xSpan == this.CELL_WIDTH && ySpan == 0) {
+        //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH))
+        this.updateBothCoordinates(this.cells.right.x,this.cells.right.y-this.CELL_WIDTH,undefined,undefined)
+      }
+      if (xSpan == 0 && ySpan == -this.CELL_WIDTH) {
+        //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x-this.CELL_WIDTH,this.cells.left.y)&&this.checkBordersOnRotation(this.cells.right.x,this.cells.right.y+this.CELL_WIDTH))
+        this.updateBothCoordinates(this.cells.left.x-this.CELL_WIDTH,this.cells.left.y,this.cells.right.x,this.cells.right.y+this.CELL_WIDTH)
+      }
+      if (xSpan == -this.CELL_WIDTH && ySpan == 0) {
+        //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x,this.cells.left.y)&&this.checkBordersOnRotation(this.cells.right.x+this.CELL_WIDTH,this.cells.left.y-this.CELL_WIDTH))
+        this.updateBothCoordinates(this.cells.left.x,this.cells.left.y,this.cells.right.x+this.CELL_WIDTH,this.cells.left.y-this.CELL_WIDTH)
+      }
+      if (xSpan == 0 && ySpan == this.CELL_WIDTH) {
+        //prettier-ignore
+        if(this.checkBordersOnRotation(this.cells.left.x,this.cells.right.y)&&this.checkBordersOnRotation(this.cells.right.x-this.CELL_WIDTH,this.cells.right.y))
+        this.updateBothCoordinates(this.cells.left.x,this.cells.right.y,this.cells.right.x-this.CELL_WIDTH,this.cells.right.y)
+      }
+    }
+  }
+  private renderSkin() {
+    if (this.cells.left.y === this.cells.right.y - this.CELL_WIDTH) {
+      this.cells.left.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("top", this.cells.left.color) + "')";
+      this.cells.right.div.style.backgroundImage =
+        "url('" +
+        this.getBackgroundUrl("bottom", this.cells.right.color) +
+        "')";
+    }
+
+    if (this.cells.left.y === this.cells.right.y + this.CELL_WIDTH) {
+      this.cells.left.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("bottom", this.cells.left.color) + "')";
+      this.cells.right.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("top", this.cells.right.color) + "')";
+    }
+
+    if (this.cells.left.x === this.cells.right.x - this.CELL_WIDTH) {
+      this.cells.left.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("left", this.cells.left.color) + "')";
+      this.cells.right.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("right", this.cells.right.color) + "')";
+    }
+
+    if (this.cells.left.x === this.cells.right.x + this.CELL_WIDTH) {
+      this.cells.left.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("right", this.cells.left.color) + "')";
+      this.cells.right.div.style.backgroundImage =
+        "url('" + this.getBackgroundUrl("left", this.cells.right.color) + "')";
+    }
+  }
+  private updateBothCoordinates(
+    xLeft: number | undefined,
+    yLeft: number | undefined,
+    xRight: number | undefined,
+    yRight: number | undefined
+  ) {
+    //prettier-ignore
+    if (yLeft > this.BOARD_HEIGHT ||yRight > this.BOARD_HEIGHT ||xLeft < 0 ||xLeft >= this.BOARD_WIDTH ||xRight < 0 ||xRight >= this.BOARD_WIDTH)
+      return;
+    if (yLeft !== undefined) {
+      this.cells.left.y = yLeft;
+      this.cells.left.div.style.top = yLeft + "px";
+    }
+    if (xLeft !== undefined) {
+      this.cells.left.x = xLeft;
+      this.cells.left.div.style.left = xLeft + "px";
+    }
+    if (yRight !== undefined) {
+      this.cells.right.y = yRight;
+      this.cells.right.div.style.top = yRight + "px";
+    }
+    if (xRight !== undefined) {
+      this.cells.right.x = xRight;
+      this.cells.right.div.style.left = xRight + "px";
+    }
+    this.renderSkin();
   }
 }

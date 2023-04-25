@@ -1,23 +1,218 @@
-.cell{
-    width: 18px;
-    height: 18px;
-    border: 1px solid black;
-    position: absolute;
+.cell {
+  width: 15px;
+  height: 15px;
+  /* border: 1px solid red; */
+  position: absolute;
 }
-#board{
-    position: absolute;
-    margin: 20px;
-    width: 160px;
-    height: 300px;
+body {
+  background-color: rgb(15, 3, 40);
 }
-.pionek{
-    width: 40px;
-    height: 20px;
-    position: absolute;
+#board {
+  position: absolute;
+  top: 100px;
+  left: 270px;
+  width: 135px;
+  height: 255px;
+}
+#board-img-cont {
+  width: 642px;
+  height: 383px;
+  position: absolute;
+  top: 30%;
+  left: 30%;
+}
+.pionek {
+  width: 40px;
+  height: 20px;
+  position: absolute;
 
-display: flex;
+  display: flex;
 }
-.pionek-cell{
-    width: 20px;
-    height: 20px;
+.pionek-cell {
+  position: absolute;
+
+  width: 15px;
+  height: 15px;
 }
+.stopped-cell {
+  position: absolute;
+}
+.virus-cont {
+  width: 96px;
+  height: 72px;
+  position: absolute;
+  top: 51%;
+  left: 51%;
+  margin: -45px;
+  /* transform: translateX(-48px);
+  transform: translateY(-36px); */
+  transform: scale(0.7);
+}
+.virus-wrapper {
+  width: 170px;
+  height: 170px;
+  /* background-color: aliceblue; */
+  position: absolute;
+  top: 205px;
+  left: 37px;
+}
+
+.score-cont {
+  width: 192px;
+  height: 25px;
+  position: absolute;
+  background-color: black;
+  border: 1px solid black;
+  transform: scale(0.7);
+  background-repeat: no-repeat;
+}
+#top-cont {
+  left: 40px;
+  top: 73px;
+}
+#cur-cont {
+  left: 40px;
+  top: 123px;
+}
+#hand-cont {
+  position: absolute;
+  /* background-color: black; */
+  /* border: 1px solid red; */
+  height: 90px;
+  width: 60px;
+  top: 49px;
+  left: 464px;
+  background-repeat: no-repeat;
+  transform: scale(0.7);
+}
+#alive-num {
+  width: 48px;
+  height: 30px;
+  position: absolute;
+  background-color: black;
+  transform: scale(0.7);
+  background-repeat: no-repeat;
+  left: 555px;
+  top: 330px;
+}
+#alertLoose {
+  width: 332px;
+  height: 118px;
+  position: absolute;
+  top: 38%;
+  left: 27%;
+}
+#alert {
+  width: 422px;
+  height: 118px;
+  position: absolute;
+  top: 38%;
+  left: 18%;
+}
+#dr {
+  width: 166px;
+  height: 166px;
+  position: absolute;
+  top: 20px;
+  left: 452px;
+  border: 1px solid red;
+  transform: scale(0.7);
+}
+/* start */
+
+div#yellow.first-step {
+  transform: translateY(25px) translateX(-48px) scale(0.7);
+}
+div#blue.first-step {
+  transform: translateY(-36px) scale(0.7) translateX(0);
+}
+div#red.first-step {
+  transform: translateY(25px) translateX(40px) scale(0.7);
+}
+/* second */
+
+div#yellow.second-step {
+  transform: translateY(40px) translateX(-30px) scale(0.7);
+}
+div#blue.second-step {
+  transform: translateY(-30px) scale(0.7) translateX(-40px);
+}
+div#red.second-step {
+  transform: translateY(5px) translateX(50px) scale(0.7);
+}
+/* third */
+
+div#yellow.third-step {
+  transform: translateY(40px) translateX(25px) scale(0.7);
+}
+div#blue.third-step {
+  transform: translateY(0px) scale(0.7) translateX(-70px);
+}
+div#red.third-step {
+  transform: translateY(-25px) translateX(30px) scale(0.7);
+}
+
+/* fourth */
+
+div#yellow.fourth-step {
+  transform: translateY(10px) translateX(40px) scale(0.7);
+}
+div#blue.fourth-step {
+  transform: translateY(30px) scale(0.7) translateX(-60px);
+}
+div#red.fourth-step {
+  transform: translateY(-40px) translateX(-15px) scale(0.7);
+}
+/* fourth */
+
+div#yellow.fifth-step {
+  transform: translateY(-30px) translateX(20px) scale(0.7);
+}
+div#blue.fifth-step {
+  transform: translateY(45px) scale(0.7) translateX(25px);
+}
+div#red.fifth-step {
+  transform: translateY(5px) translateX(-50px) scale(0.7);
+}
+/* fivth */
+
+div#yellow.sixth-step {
+  transform: translateY(-30px) translateX(-30px) scale(0.7);
+}
+div#blue.sixth-step {
+  transform: translateY(10px) scale(0.7) translateX(55px);
+}
+div#red.sixth-step {
+  transform: translateY(35px) translateX(-40px) scale(0.7);
+}
+
+/* second */
+/* div#yellow {
+  transform: translateY(40px) translateX(-35px) scale(0.7);
+}
+#blue {
+  transform: translateY(-30px) scale(0.7) translateX(-50px);
+}
+#red {
+  transform: translateY(10px) translateX(44px) scale(0.7);
+} */
+/* third */
+/* #yellow {
+  transform: translateY(50px) translateX(-10px) scale(0.7);
+}
+#blue {
+  transform: translateY(-10px) scale(0.7) translateX(-70px);
+}
+#red {
+  transform: translateY(-10px) translateX(44px) scale(0.7);
+} */
+/* fourth */
+/* #yellow {
+  transform: translateY(50px) translateX(-10px) scale(0.7);
+}
+#blue {
+  transform: translateY(-10px) scale(0.7) translateX(-70px);
+}
+#red {
+  transform: translateY(-10px) translateX(44px) scale(0.7);
+} */
