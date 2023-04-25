@@ -329,7 +329,7 @@ export class Game implements GameInter {
           pos.y + this.CELL_WIDTH == element.y &&
           element.div !== null
         ) {
-          if (pos.y <= 17) {
+          if (pos.y < 17) {
             this.stop = true;
             this.renderAlert("gameOver");
           }
@@ -447,14 +447,14 @@ export class Game implements GameInter {
     }, 100);
   }
   private spadamyPanowie() {
-    // let opadlo;
+    let opadlo;
     // const opadanie = () => {
     //   opadlo = false;
     //   for (let index = this.allCells.length - 1; index > 0; index--) {
     //     const cell: Cell = this.allCells[index];
     //     if (cell.div == null) continue;
     //     const indexBelow = this.allCells.findIndex(
-    //       (el) => el.x == cell.x && el.y - 20 == cell.y
+    //       (el) => el.x == cell.x && el.y - this.CELL_WIDTH == cell.y
     //     );
     //     if (indexBelow == -1) continue;
     //     const cellBellow = this.allCells[indexBelow];
@@ -479,7 +479,12 @@ export class Game implements GameInter {
     // };
     // opadanie();
   }
-
+  private reRender() {
+    this.allCells.forEach((cell) => {
+      if (cell.div == null) return;
+      cell.div.style.top = cell.y + "px";
+    });
+  }
   private getBackgroundUrlVirus(data, color: string) {
     let canvas = document.createElement("canvas");
     canvas.width = 15;

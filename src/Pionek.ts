@@ -242,7 +242,10 @@ export class Pionek {
     });
 
     document.addEventListener("keyup", (e: KeyboardEvent) => {
-      if (e.key == "ArrowDown") this.manualMovingDown = false;
+      if (e.key == "ArrowDown")
+        setTimeout(() => {
+          this.manualMovingDown = false;
+        }, 100);
     });
   }
 
