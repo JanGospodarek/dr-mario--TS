@@ -61,9 +61,11 @@ export class Game implements GameInter {
 
         this.img.onload = () => {
           this.boardGraphicCoords = data.board.pos;
-          imgsArray.push(new Anim(this.img, data.blue, "blue"));
-          imgsArray.push(new Anim(this.img, data.yellow, "yellow"));
-          imgsArray.push(new Anim(this.img, data.red, "red"));
+
+          new Set(this.possibleColors).forEach((color) =>
+            imgsArray.push(new Anim(this.img, data[color], color))
+          );
+
           anim();
           ////
           this.renderBoard();
@@ -71,7 +73,10 @@ export class Game implements GameInter {
           this.renderViruses(data);
           this.renderScore();
           this.renderScore();
-          this.renderNumOfViruses();
+          this.renderScoreHelper(
+            String(this.aliveViruses).padStart(2, "0"),
+            this.aliveNumCont
+          );
           this.animateViruses();
           this.renderHand(2);
         };
@@ -115,7 +120,7 @@ export class Game implements GameInter {
     if (this.stop) return;
 
     //prettier-ignore
-    this.pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrlPill,this.checkBordersOnRotation,this.data,this.renderHand,this.renderPionek);
+    this.pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrl,this.checkBordersOnRotation,this.data,this.renderHand,this.renderPionek);
     if (this.first) {
       this.pionek.throwPill();
       this.first = false;
@@ -125,23 +130,15 @@ export class Game implements GameInter {
   renderHand = (index: number) => {
     const frames = this.data.hand.frames[index];
     let canvas = document.createElement("canvas");
+
     canvas.width = 60;
     canvas.height = 90;
+
     let ctx = canvas.getContext("2d");
     if (index == 2) {
       const frame = frames["top"];
-
-      ctx.drawImage(
-        this.img,
-        frame.x0,
-        frame.y0,
-        frame.w,
-        frame.h,
-        35,
-        50,
-        frame.w,
-        frame.h
-      );
+      //prettier-ignore
+      ctx.drawImage(this.img,frame.x0,frame.y0,frame.w,frame.h,35,50,frame.w,frame.h);
     } else {
       let i = 0;
       let x,
@@ -155,23 +152,13 @@ export class Game implements GameInter {
       }
       for (const key in frames) {
         const frame = frames[key];
-        ctx.drawImage(
-          this.img,
-          frame.x0,
-          frame.y0,
-          frame.w,
-          frame.h,
-          x,
-          y + frame.h * i,
-          frame.w,
-          frame.h
-        );
+        //prettier-ignore
+        ctx.drawImage(this.img,frame.x0,frame.y0,frame.w,frame.h,x,y + frame.h * i,frame.w,frame.h);
         i++;
       }
     }
 
     let url = canvas.toDataURL();
-
     this.handCont.style.backgroundImage = "url('" + url + "')";
   };
 
@@ -190,7 +177,7 @@ export class Game implements GameInter {
       div.style.left = `${this.allCells[index].x}px`;
       div.style.top = `${this.allCells[index].y}px`;
 
-      const url = this.getBackgroundUrlVirus(data, this.possibleColors[i]);
+      const url = this.getBackgroundUrl(undefined, this.possibleColors[i]);
 
       div.style.backgroundImage = "url('" + url + "')";
 
@@ -228,12 +215,15 @@ export class Game implements GameInter {
     const indexOfVirus = this.cellsToDelete.findIndex(
       (el) => el.flag == "virus"
     );
+
     if (indexOfVirus !== -1) {
       const virusCell: Cell = this.cellsToDelete[indexOfVirus];
       const id = virusCell.id;
+
       const indexOfVirus2 = this.cellsToDelete.findIndex(
         (el) => el.flag == "virus" && el.id != id
       );
+
       if (indexOfVirus2 !== -1) {
         this.aliveViruses -= 2;
         this.score += 200;
@@ -241,29 +231,36 @@ export class Game implements GameInter {
         this.aliveViruses--;
         this.score += 100;
       }
-      // this.viruses[virusCell.color].style.display = "none";
-      this.renderNumOfViruses();
+
       if (this.score > this.bestScore) this.bestScore = this.score;
 
-      localStorage.setItem("best", String(this.score));
+      this.renderScoreHelper(
+        String(this.aliveViruses).padStart(2, "0"),
+        this.aliveNumCont
+      );
+
+      localStorage.setItem("best", String(this.bestScore));
       let allKilled = false;
+
       if (this.aliveViruses == 0) allKilled = true;
       if (allKilled) this.renderAlert("stageCompleted");
+
       this.renderScore();
     }
   }
 
   private renderScore() {
-    const curStr = String(this.score).padStart(8, "0");
-    const bestStr = String(this.bestScore).padStart(8, "0");
+    this.renderScoreHelper(
+      String(this.score).padStart(8, "0"),
+      this.curScoreCon
+    );
 
-    this.renderScoreHelper(curStr, this.curScoreCon);
-    this.renderScoreHelper(bestStr, this.bestScoreCon);
+    this.renderScoreHelper(
+      String(this.bestScore).padStart(8, "0"),
+      this.bestScoreCon
+    );
   }
-  private renderNumOfViruses() {
-    const aliveStr = String(this.aliveViruses).padStart(2, "0");
-    this.renderScoreHelper(aliveStr, this.aliveNumCont);
-  }
+
   renderScoreHelper(str: string, place: HTMLDivElement) {
     let canvas = document.createElement("canvas");
     let ctx = canvas.getContext("2d");
@@ -293,19 +290,17 @@ export class Game implements GameInter {
 
   public renew = (pionek) => {
     for (const key in pionek.cells) {
-      const c = pionek.cells[key];
-      const index = this.allCells.findIndex((el) => el.x == c.x && el.y == c.y);
+      const cell = pionek.cells[key];
+      const index = this.allCells.findIndex(
+        (el) => el.x == cell.x && el.y == cell.y
+      );
 
-      this.allCells[index].x = c.x;
-      this.allCells[index].y = c.y;
-
-      this.allCells[index].color = c.color;
-      this.allCells[index].div = c.div;
-      this.allCells[index].id = c.id;
+      this.allCells[index].color = cell.color;
+      this.allCells[index].div = cell.div;
+      this.allCells[index].id = cell.id;
     }
 
     this.checkForZbicie(pionek);
-    // this.renderPionek();
     if (!this.stop) this.pionek.throwPill();
   };
 
@@ -323,15 +318,14 @@ export class Game implements GameInter {
     this.allCells.forEach((element) => {
       for (const key in pionek.cells) {
         const pos = pionek.cells[key];
+        //prettier-ignore
+        if (pos.x == element.x &&pos.y + this.CELL_WIDTH == element.y &&element.div !== null) {
 
-        if (
-          pos.x == element.x &&
-          pos.y + this.CELL_WIDTH == element.y &&
-          element.div !== null
-        ) {
           if (pos.y < 17) {
+
             this.stop = true;
             this.renderAlert("gameOver");
+
           }
           wynik = true;
         }
@@ -358,12 +352,10 @@ export class Game implements GameInter {
           break;
         }
 
-        if (this.allCells[l].div == null) {
-          bool = false;
-          break;
-        }
-
-        if (this.allCells[l].color !== element.color) {
+        if (
+          this.allCells[l].div == null ||
+          this.allCells[l].color !== element.color
+        ) {
           bool = false;
           break;
         }
@@ -375,20 +367,18 @@ export class Game implements GameInter {
 
     for (const key in pionek.cells) {
       const obj = pionek.cells[key];
+      //prettier-ignore
+      let indexLeft = -1,indexBottom = -1,indexTop = -1,indexRight = -1;
 
-      const indexLeft = this.allCells.findIndex(
-        (el) => el.x == obj.x - this.CELL_WIDTH && el.y == obj.y
-      );
-      const indexTop = this.allCells.findIndex(
-        (el) => el.x == obj.x && el.y == obj.y - this.CELL_WIDTH
-      );
-      const indexRight = this.allCells.findIndex(
-        (el) => el.x == obj.x + this.CELL_WIDTH && el.y == obj.y
-      );
-      const indexBottom = this.allCells.findIndex(
-        (el) => el.x == obj.x && el.y == obj.y + this.CELL_WIDTH
-      );
+      this.allCells.forEach((el, i) => {
+        if (el.x == obj.x - this.CELL_WIDTH && el.y == obj.y) indexLeft = i;
+        if (el.x == obj.x && el.y == obj.y - this.CELL_WIDTH) indexTop = i;
+        if (el.x == obj.x + this.CELL_WIDTH && el.y == obj.y) indexRight = i;
+        if (el.x == obj.x && el.y == obj.y + this.CELL_WIDTH) indexBottom = i;
+      });
+
       const indexes = [indexLeft, indexRight, indexTop, indexBottom];
+      console.log(indexes);
 
       ////////////
 
@@ -401,27 +391,26 @@ export class Game implements GameInter {
         const vectorY = obj.y - cellObj.y;
 
         if (checkInRow(obj, vectorX, vectorY)) {
-          console.log("znaleziono!", obj.color);
-
           this.checkIfVirusWasKilled();
 
           this.cellsToDelete.forEach((cell) => {
             const index = this.allCells.findIndex(
               (el) => el.x == cell.x && el.y == cell.y
             );
+
             const cellToDelete = this.allCells[index];
             const id = cellToDelete.id;
             cellToDelete.id = null;
 
             const siblingIndex = this.allCells.findIndex((el) => el.id == id);
-            if (
-              siblingIndex !== -1 &&
-              this.allCells[siblingIndex].div !== null
-            ) {
+            //prettier-ignore
+            if (siblingIndex !== -1 &&this.allCells[siblingIndex].div !== null) {
+
               const cell = this.allCells[siblingIndex];
               cell.div.style.backgroundImage =
-                "url('" + this.getBackgroundUrlPill("one", cell.color) + "')";
+                "url('" + this.getBackgroundUrl("one", cell.color) + "')";
             }
+
             this.destroyAnimation(cellToDelete);
             this.spadamyPanowie();
           });
@@ -442,7 +431,7 @@ export class Game implements GameInter {
         return;
       }
       cell.div.style.backgroundImage =
-        "url('" + this.getBackgroundUrlDestroy(index, cell.color) + "')";
+        "url('" + this.getBackgroundUrl(index, cell.color) + "')";
       index++;
     }, 100);
   }
@@ -485,10 +474,10 @@ export class Game implements GameInter {
       cell.div.style.top = cell.y + "px";
     });
   }
-  private getBackgroundUrlVirus(data, color: string) {
+  private getBackgroundUrl = (direction: any, color: string) => {
     let canvas = document.createElement("canvas");
-    canvas.width = 15;
-    canvas.height = 15;
+    canvas.width = 17;
+    canvas.height = 17;
     let ctx = canvas.getContext("2d");
 
     //prettier-ignore
@@ -497,78 +486,22 @@ export class Game implements GameInter {
     arr.shift();
     arr.unshift(firtsLetter);
 
-    console.log(data.virusRed);
+    //prettier-ignore
+    if(typeof direction=="string"){
+      const pos = this.data[`cell${arr.join("")}`];
+      ctx.drawImage(this.img,pos[direction].x0,pos[direction].y0,pos[direction].w,pos[direction].h,0,0,pos[direction].w,pos[direction].h);
 
-    ctx.drawImage(
-      this.img,
-      data[`virus${arr.join("")}`].pos.x0,
-      data[`virus${arr.join("")}`].pos.y0,
-      data[`virus${arr.join("")}`].pos.w,
-      data[`virus${arr.join("")}`].pos.h,
-      0,
-      0,
-      data[`virus${arr.join("")}`].pos.w,
-      data[`virus${arr.join("")}`].pos.h
-    );
+    }else if(typeof direction=="number"){
+      const pos = this.data[`cell${arr.join("")}`];
+//prettier-ignore
+    ctx.drawImage(this.img,pos.animation[direction].x0,pos.animation[direction].y0,pos.animation[direction].w,pos.animation[direction].h,0,0,pos.animation[direction].w,pos.animation[direction].h);
+    }
+    else{
+      ctx.drawImage(this.img,this.data[`virus${arr.join("")}`].pos.x0,this.data[`virus${arr.join("")}`].pos.y0,this.data[`virus${arr.join("")}`].pos.w,this.data[`virus${arr.join("")}`].pos.h,0,0,this.data[`virus${arr.join("")}`].pos.w,this.data[`virus${arr.join("")}`].pos.h);
 
-    let url = canvas.toDataURL();
-    return url;
-  }
-
-  private getBackgroundUrlPill = (direction, color) => {
-    let canvas = document.createElement("canvas");
-    canvas.width = 17;
-    canvas.height = 17;
-    let ctx = canvas.getContext("2d");
-    const firtsLetter = color[0].toUpperCase();
-    const arr = color.split("");
-    arr.shift();
-    arr.unshift(firtsLetter);
-
-    const pos = this.data[`cell${arr.join("")}`];
-
-    ctx.drawImage(
-      this.img,
-      pos[direction].x0,
-      pos[direction].y0,
-      pos[direction].w,
-      pos[direction].h,
-      0,
-      0,
-      pos[direction].w,
-      pos[direction].h
-    );
+    }
 
     let url = canvas.toDataURL();
-
-    return url;
-  };
-  private getBackgroundUrlDestroy = (index, color) => {
-    let canvas = document.createElement("canvas");
-    canvas.width = 17;
-    canvas.height = 17;
-    let ctx = canvas.getContext("2d");
-    const firtsLetter = color[0].toUpperCase();
-    const arr = color.split("");
-    arr.shift();
-    arr.unshift(firtsLetter);
-
-    const pos = this.data[`cell${arr.join("")}`];
-
-    ctx.drawImage(
-      this.img,
-      pos.animation[index].x0,
-      pos.animation[index].y0,
-      pos.animation[index].w,
-      pos.animation[index].h,
-      0,
-      0,
-      pos.animation[index].w,
-      pos.animation[index].h
-    );
-
-    let url = canvas.toDataURL();
-
     return url;
   };
   renderAlert(msg) {
