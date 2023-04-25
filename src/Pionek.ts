@@ -4,24 +4,10 @@ import genUniqueId from "./utils/genUniqueId";
 export class Pionek {
   private btn = <HTMLDivElement>document.getElementById("stop");
   id = genUniqueId();
-
+  //prettier-ignore
   cells: Cells = {
-    left: {
-      x: 220,
-      y: -50,
-      div: null,
-      color: "none",
-      flag: "normal",
-      id: this.id,
-    },
-    right: {
-      x: 237,
-      y: -50,
-      div: null,
-      color: "none",
-      flag: "normal",
-      id: this.id,
-    },
+    left: {x: 220,y: -50,div: null,color: "none",flag: "normal",id: this.id,},
+    right: {x: 237,y: -50,div: null,color: "none",flag: "normal",id: this.id,},
   };
   private possibleColors = ["red", "yellow", "blue"];
 
@@ -48,13 +34,8 @@ export class Pionek {
     this.buildPionek();
     this.renderSkin();
     this.renderHand(0);
-    // this.throwPill();
-
-    ///development proposes
-    this.btn.addEventListener("click", () => {
-      clearInterval(this.movingInterval);
-    });
   }
+
   public throwPill = () => {
     let index = 0;
     let i = setInterval(() => {
@@ -73,9 +54,12 @@ export class Pionek {
         frame[key].y !== 0
           ? (cell.y = frame[key].y + 5)
           : (cell.y = frame[key].y);
+
         cell.div.style.top = `${String(cell.y)}px`;
         cell.div.style.left = `${String(cell.x)}px`;
+
         this.renderSkin();
+
         if (index < 8) this.renderHand(0);
         else if (index < 16) this.renderHand(1);
         else if (index < 25) this.renderHand(2);
@@ -84,20 +68,19 @@ export class Pionek {
     }, 60);
   };
   private buildPionek() {
-    let fristColor: number | null = null;
-
     for (let index = 0; index < 2; index++) {
       const cell = document.createElement("div");
 
       const colorIndex = this.getColor();
 
       cell.style.backgroundColor = this.possibleColors[colorIndex];
-      // cell.innerText = String(index);
+
       cell.classList.add("pionek-cell");
 
       this.boardDiv.append(cell);
 
       let key = "";
+
       index == 0 ? (key = "left") : (key = "right");
 
       cell.style.left = this.cells[key].x + "px";
@@ -175,55 +158,29 @@ export class Pionek {
       const key = e.key;
       switch (key) {
         case "ArrowLeft":
-          // prettier-ignore
           if (this.checkLeftCollision()) break;
-
-          this.updateBothCoordinates(
-            this.cells.left.x - this.CELL_WIDTH,
-            undefined,
-            this.cells.right.x - this.CELL_WIDTH,
-            undefined
-          );
-
-          if (this.checkBottomCollision()) {
-            clearInterval(this.movingInterval);
-            this.stop = true;
-            this.renewGame(this);
-            return;
-          }
+          // prettier-ignore
+          this.updateBothCoordinates(this.cells.left.x - this.CELL_WIDTH,undefined,this.cells.right.x - this.CELL_WIDTH,undefined);
+          // prettier-ignore
+          if (this.checkBottomCollision()) {clearInterval(this.movingInterval);this.stop = true;this.renewGame(this);return; }
 
           break;
         case "ArrowRight":
+          if (this.checkRightCollision()) break;
           // prettier-ignore
-          if (this.checkRightCollision() ) break;
-          this.updateBothCoordinates(
-            this.cells.left.x + this.CELL_WIDTH,
-            undefined,
-            this.cells.right.x + this.CELL_WIDTH,
-            undefined
-          );
-
-          if (this.checkBottomCollision()) {
-            clearInterval(this.movingInterval);
-            this.stop = true;
-            this.renewGame(this);
-            return;
-          }
+          this.updateBothCoordinates(this.cells.left.x + this.CELL_WIDTH,undefined,this.cells.right.x + this.CELL_WIDTH,undefined);
+          // prettier-ignore
+          if (this.checkBottomCollision()) {clearInterval(this.movingInterval);this.stop = true;this.renewGame(this);return;}
           break;
         case "ArrowDown":
-          // prettier-ignore
           this.manualMovingDown = true;
 
           if (this.checkBottomCollision()) {
             this.stop = true;
             break;
           }
-          this.updateBothCoordinates(
-            undefined,
-            this.cells.left.y + this.CELL_WIDTH,
-            undefined,
-            this.cells.right.y + this.CELL_WIDTH
-          );
+          // prettier-ignore
+          this.updateBothCoordinates(undefined,this.cells.left.y + this.CELL_WIDTH,undefined,this.cells.right.y + this.CELL_WIDTH);
 
           break;
         case "r":
@@ -334,14 +291,8 @@ export class Pionek {
     xRight: number | undefined,
     yRight: number | undefined
   ) {
-    if (
-      yLeft > this.BOARD_HEIGHT ||
-      yRight > this.BOARD_HEIGHT ||
-      xLeft < 0 ||
-      xLeft >= this.BOARD_WIDTH ||
-      xRight < 0 ||
-      xRight >= this.BOARD_WIDTH
-    )
+    //prettier-ignore
+    if (yLeft > this.BOARD_HEIGHT ||yRight > this.BOARD_HEIGHT ||xLeft < 0 ||xLeft >= this.BOARD_WIDTH ||xRight < 0 ||xRight >= this.BOARD_WIDTH)
       return;
     if (yLeft !== undefined) {
       this.cells.left.y = yLeft;
