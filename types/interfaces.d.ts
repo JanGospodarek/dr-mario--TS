@@ -1,10 +1,3 @@
-export interface cellObj {
-  x: number;
-  y: number;
-  id: string;
-  color: string;
-  div: HTMLElement | null;
-}
 export interface Cells {
   left: Cell;
   right: Cell;
@@ -28,10 +21,33 @@ export interface Cell {
 //   cells: Cells;
 // }
 export interface GameInter {
-  boardCon: HTMLDivElement;
-  allCells: Cell[];
+  CELL_WIDTH: number;
   score: number;
+  bestScore: number;
+  destId: string;
+  gameId: string;
+  stop: boolean;
+  first: boolean;
+  allCells: Cell[];
   cellsToDelete: Cell[];
+  pionek: Pionek;
+  aliveViruses: number;
+  steps: string[];
+  possibleColors: string[];
+  data: any;
+  img: any;
+  boardGraphicCoords: frame;
+}
+export interface PionekInter {
+  id: string;
+  cells: Cells;
+  possibleColors: string[];
+  CELL_WIDTH: number;
+  BOARD_WIDTH: number;
+  BOARD_HEIGHT: number;
+  stop: boolean;
+  manualMovingDown: boolean;
+  movingInterval: any;
 }
 export interface frame {
   x0: number;

@@ -1,4 +1,4 @@
-import { Cell, GameInter, cellObj } from "../types/interfaces";
+import { Cell, GameInter } from "../types/interfaces";
 import { Pionek } from "./Pionek";
 import genUniqueId from "./utils/genUniqueId";
 import { frame } from "../types/interfaces";
@@ -71,7 +71,7 @@ export class Game implements GameInter {
           ////
           this.renderBoard();
           this.renderPionek();
-          this.renderViruses(data);
+          this.renderViruses();
           this.renderScore();
           this.renderScore();
           this.renderScoreHelper(
@@ -83,6 +83,10 @@ export class Game implements GameInter {
         };
       });
   }
+
+  /**
+   * Rendering board grid with pills and board background
+   */
 
   private renderBoard() {
     for (let y = 0; y < 15; y++) {
@@ -121,13 +125,16 @@ export class Game implements GameInter {
     if (this.stop) return;
 
     //prettier-ignore
-    this.pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrl,this.checkBordersOnRotation,this.data,this.renderHand,this.renderPionek);
+    this.pionek = new Pionek(this.boardCon,this.checkBorderPionks,this.renew,this.checkCollisionsOnMove,this.getBackgroundUrl,this.data,this.renderHand,this.renderPionek);
     if (this.first) {
       this.pionek.throwPill();
       this.first = false;
     }
   };
-
+  /**
+   * Renders next positions of hand during throwing animation
+   * @param index - index of hand position furing throwing a pill animation
+   */
   renderHand = (index: number) => {
     const frames = this.data.hand.frames[index];
     let canvas = document.createElement("canvas");
@@ -162,12 +169,14 @@ export class Game implements GameInter {
     let url = canvas.toDataURL();
     this.handCont.style.backgroundImage = "url('" + url + "')";
   };
-
-  private renderViruses(data) {
+  /**
+   * rendering virus cells on board
+   */
+  private renderViruses() {
     const indexes = [];
 
     while (indexes.length < 4) {
-      const index = 60 + Math.floor(Math.random() * 60);
+      const index = 40 + Math.floor(Math.random() * 60);
       if (indexes.indexOf(index) === -1) indexes.push(index);
     }
 
@@ -190,11 +199,14 @@ export class Game implements GameInter {
     });
   }
 
+  /**
+   * animating viruses in bottom left corner of board
+   */
   private animateViruses() {
     let iterator = 1;
     let i = setInterval(() => {
       if (iterator == 7) iterator = 1;
-
+      if (this.stop) return;
       for (const key in this.viruses) {
         const virus = <HTMLDivElement>this.viruses[key];
 
@@ -212,6 +224,9 @@ export class Game implements GameInter {
     }, 2000);
   }
 
+  /**
+   * Checking if virus has been killed during destroing cells
+   */
   private checkIfVirusWasKilled() {
     const indexOfVirus = this.cellsToDelete.findIndex(
       (el) => el.flag == "virus"
@@ -249,7 +264,9 @@ export class Game implements GameInter {
       this.renderScore();
     }
   }
-
+  /**
+   * Rendering current score and best score
+   */
   private renderScore() {
     this.renderScoreHelper(
       String(this.score).padStart(8, "0"),
@@ -261,7 +278,11 @@ export class Game implements GameInter {
       this.bestScoreCon
     );
   }
-
+  /**
+   *
+   * @param str - string to display in score container
+   * @param place - score container to display score
+   */
   renderScoreHelper(str: string, place: HTMLDivElement) {
     let canvas = document.createElement("canvas");
     let ctx = canvas.getContext("2d");
@@ -279,7 +300,12 @@ export class Game implements GameInter {
 
     place.style.backgroundImage = "url('" + url + "')";
   }
-
+  /**
+   * Cheks if there is cell on x,y position on board grid
+   * @param x - X position of alleged cell
+   * @param y - Y position of alleged cell
+   * @returns - Boolean value - if cell was found returns true, else returns false
+   */
   private checkCollisionsOnMove = (x, y) => {
     const index = this.allCells.findIndex(
       (el) => el.x == x && el.y == y && el.div !== null
@@ -288,7 +314,10 @@ export class Game implements GameInter {
     if (index == -1) return false;
     else return true;
   };
-
+  /**
+   * Writes pill data to cells in board after pill has been stopped
+   * @param pionek - Pionek object of pill which has just been stopped
+   */
   public renew = (pionek) => {
     for (const key in pionek.cells) {
       const cell = pionek.cells[key];
@@ -304,15 +333,24 @@ export class Game implements GameInter {
     this.checkForZbicie(pionek);
     if (!this.stop) this.pionek.throwPill();
   };
-
-  public checkBordersOnRotation = (x, y) => {
-    const index = this.allCells.findIndex(
-      (el) => el.div !== null && el.x == x && el.y == y
-    );
-    if (index == -1) return true;
-    else return false;
-  };
-
+  // /**
+  //  *
+  //  * @param x
+  //  * @param y
+  //  * @returns
+  //  */
+  // public checkBordersOnRotation = (x, y) => {
+  //   const index = this.allCells.findIndex(
+  //     (el) => el.div !== null && el.x == x && el.y == y
+  //   );
+  //   if (index == -1) return true;
+  //   else return false;
+  // };
+  /**
+   * Check collision with other cells
+   * @param pionek - Pionek object that is currently moving
+   * @returns if collision is detected returns true else false
+   */
   public checkBorderPionks = (pionek: Pionek) => {
     let wynik = false;
 
@@ -322,7 +360,7 @@ export class Game implements GameInter {
         //prettier-ignore
         if (pos.x == element.x &&pos.y + this.CELL_WIDTH == element.y &&element.div !== null) {
 
-          if (pos.y <= 17) {
+          if (pos.y <=17 ) {
 
             this.stop = true;
             this.renderAlert("gameOver");
@@ -336,6 +374,10 @@ export class Game implements GameInter {
     return wynik;
   };
 
+  /**
+   * Check for destroying nearby cells
+   * @param pionek - Pionek Object which has just been stooped
+   */
   private checkForZbicie(pionek: Pionek) {
     const checkInRow = (element: Cell, vectorX: number, vectorY: number) => {
       this.cellsToDelete = [element];
@@ -419,6 +461,10 @@ export class Game implements GameInter {
       });
     }
   }
+  /**
+   *
+   * @param cell - cell to render destroying animation after cell has been destroyed
+   */
   private destroyAnimation(cell: Cell) {
     let index = 0;
 
@@ -436,8 +482,11 @@ export class Game implements GameInter {
       index++;
     }, 100);
   }
+  /**
+   * Shit that dont work
+   */
   private spadamyPanowie() {
-    let opadlo;
+    // let opadlo;
     // const opadanie = () => {
     //   opadlo = false;
     //   for (let index = this.allCells.length - 1; index > 0; index--) {
@@ -469,12 +518,18 @@ export class Game implements GameInter {
     // };
     // opadanie();
   }
-  // private reRender() {
-  //   this.allCells.forEach((cell) => {
-  //     if (cell.div == null) return;
-  //     cell.div.style.top = cell.y + "px";
-  //   });
-  // }
+  private reRender() {
+    this.allCells.forEach((cell) => {
+      if (cell.div == null) return;
+      cell.div.style.top = cell.y + "px";
+    });
+  }
+  /**
+   * Get backround image for smaller elements e.g. pills, cells, small viruses
+   * @param direction - type of data to render
+   * @param color - color of cell to render
+   * @returns imageUrl which needs to be placed in background of cell div
+   */
   private getBackgroundUrl = (direction: any, color: string) => {
     let canvas = document.createElement("canvas");
     canvas.width = 17;
@@ -502,6 +557,10 @@ export class Game implements GameInter {
     let url = canvas.toDataURL();
     return url;
   };
+  /**
+   * Render ending alerts
+   * @param msg - message
+   */
   renderAlert(msg) {
     const pos = this.data[msg].pos;
 
@@ -521,15 +580,21 @@ export class Game implements GameInter {
     }
     this.stop = true;
   }
+  /**
+   * Render loosing Dr. Mario reaction :(
+   * @param msg - message
+   */
   renderReaction(msg) {
     const pos = this.data[msg].drReaction;
 
     let canvas = document.createElement("canvas");
     canvas.width = pos.w;
-    canvas.height = 118;
+    canvas.height = pos.h;
     let ctx = canvas.getContext("2d");
     ctx.drawImage(this.img, pos.x0, pos.y0, pos.w, pos.h, 0, 0, pos.w, pos.h);
     let url = canvas.toDataURL();
+    console.log(url);
+
     this.drCont.style.backgroundImage = "url('" + url + "')";
     this.handCont.style.display = "none";
   }

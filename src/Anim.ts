@@ -16,7 +16,10 @@ export class Anim {
     this.times = ob.times; // tablica z czasami wyświetleń klatki [u mnie czas w tick'ach]
     this.repeat = ob.repeat; // czy animacja ma się powtarzać
   }
-
+  /**
+   *
+   * @param i Frame index
+   */
   renderFrame(i) {
     let canvas = document.createElement("canvas");
     canvas.width = 96;
