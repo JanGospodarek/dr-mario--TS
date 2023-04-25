@@ -9,6 +9,7 @@ export class Game implements GameInter {
   bestScoreCon = <HTMLDivElement>document.getElementById("top-cont");
   handCont = <HTMLDivElement>document.getElementById("hand-cont");
   aliveNumCont = <HTMLDivElement>document.getElementById("alive-num");
+  drCont = <HTMLDivElement>document.getElementById("dr");
   alertCon = <HTMLDivElement>document.getElementById("alert");
   alertLooseCon = <HTMLDivElement>document.getElementById("alertLoose");
   viruses = {
@@ -321,7 +322,7 @@ export class Game implements GameInter {
         //prettier-ignore
         if (pos.x == element.x &&pos.y + this.CELL_WIDTH == element.y &&element.div !== null) {
 
-          if (pos.y < 17) {
+          if (pos.y <= 17) {
 
             this.stop = true;
             this.renderAlert("gameOver");
@@ -468,20 +469,19 @@ export class Game implements GameInter {
     // };
     // opadanie();
   }
-  private reRender() {
-    this.allCells.forEach((cell) => {
-      if (cell.div == null) return;
-      cell.div.style.top = cell.y + "px";
-    });
-  }
+  // private reRender() {
+  //   this.allCells.forEach((cell) => {
+  //     if (cell.div == null) return;
+  //     cell.div.style.top = cell.y + "px";
+  //   });
+  // }
   private getBackgroundUrl = (direction: any, color: string) => {
     let canvas = document.createElement("canvas");
     canvas.width = 17;
     canvas.height = 17;
     let ctx = canvas.getContext("2d");
 
-    //prettier-ignore
-    const firtsLetter = color[0].toUpperCase()
+    const firtsLetter = color[0].toUpperCase();
     const arr = color.split("");
     arr.shift();
     arr.unshift(firtsLetter);
@@ -490,11 +490,9 @@ export class Game implements GameInter {
     if(typeof direction=="string"){
       const pos = this.data[`cell${arr.join("")}`];
       ctx.drawImage(this.img,pos[direction].x0,pos[direction].y0,pos[direction].w,pos[direction].h,0,0,pos[direction].w,pos[direction].h);
-
     }else if(typeof direction=="number"){
       const pos = this.data[`cell${arr.join("")}`];
-//prettier-ignore
-    ctx.drawImage(this.img,pos.animation[direction].x0,pos.animation[direction].y0,pos.animation[direction].w,pos.animation[direction].h,0,0,pos.animation[direction].w,pos.animation[direction].h);
+      ctx.drawImage(this.img,pos.animation[direction].x0,pos.animation[direction].y0,pos.animation[direction].w,pos.animation[direction].h,0,0,pos.animation[direction].w,pos.animation[direction].h);
     }
     else{
       ctx.drawImage(this.img,this.data[`virus${arr.join("")}`].pos.x0,this.data[`virus${arr.join("")}`].pos.y0,this.data[`virus${arr.join("")}`].pos.w,this.data[`virus${arr.join("")}`].pos.h,0,0,this.data[`virus${arr.join("")}`].pos.w,this.data[`virus${arr.join("")}`].pos.h);
@@ -517,9 +515,22 @@ export class Game implements GameInter {
     let url = canvas.toDataURL();
     if (msg == "gameOver") {
       this.alertLooseCon.style.backgroundImage = "url('" + url + "')";
+      this.renderReaction(msg);
     } else {
       this.alertCon.style.backgroundImage = "url('" + url + "')";
     }
     this.stop = true;
+  }
+  renderReaction(msg) {
+    const pos = this.data[msg].drReaction;
+
+    let canvas = document.createElement("canvas");
+    canvas.width = pos.w;
+    canvas.height = 118;
+    let ctx = canvas.getContext("2d");
+    ctx.drawImage(this.img, pos.x0, pos.y0, pos.w, pos.h, 0, 0, pos.w, pos.h);
+    let url = canvas.toDataURL();
+    this.drCont.style.backgroundImage = "url('" + url + "')";
+    this.handCont.style.display = "none";
   }
 }
